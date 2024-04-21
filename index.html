@@ -45,27 +45,24 @@
 
     <script src="https://cdn.jsdelivr.net/npm/tronweb/dist/tronweb.min.js"></script>
     <script>
+        let contractInstance;
         const contractAddress = 'TBa5PCpJMshASFGN15gWcKSqBPNeVP8axh';
-        
-        function startApp() {
-            if (!window.tronWeb || !window.tronWeb.defaultAddress.base58) {
-                document.getElementById('status').innerText = 'Waiting for TronLink...';
-                setTimeout(startApp, 1000);
-                return;
-            }
 
-            document.getElementById('status').innerText = 'TronLink is connected.';
-            document.getElementById('connectWalletButton').disabled = true;
-            initContractInstance();
-        }
+        document.getElementById('connectWalletButton').addEventListener('click', async () => {
+            if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
+                document.getElementById('status').innerText = 'Wallet is connected. You can now claim TRX.';
+                initContractInstance();
+            } else {
+                document.getElementById('status').innerText = 'Please install or unlock TronLink.';
+            }
+        });
 
         async function initContractInstance() {
             try {
-                window.contractInstance = await window.tronWeb.contract().at(contractAddress);
+                contractInstance = await window.tronWeb.contract().at(contractAddress);
                 const interval = await updateClaimInterval();
                 await updateAvailableTRX();
-                manageClaimButton(interval);
-                document.getElementById('claimButton').disabled = false;
+                await manageClaimButton(interval);
             } catch (error) {
                 console.error("Error initializing contract instance:", error);
                 document.getElementById('status').innerText = 'Error loading the contract.';
@@ -98,7 +95,41 @@
             }
         }
 
-        window.onload = startApp;
+        document.getElementById('claimButton').addEventListener('click', async () => {
+            if (!contractInstance || document.getElementById('claimButton').disabled) {
+                document.getElementById('status').innerText = 'Contract is not loaded. Connect wallet first.';
+                return;
+            }
+
+            document.getElementById('status').innerText = 'Processing claim...';
+            document.getElementById('claimButton').disabled = true; // Disable the button immediately
+
+            try {
+                const result = await contractInstance.claimTRX().send({
+                    shouldPollResponse: true
+                });
+                setTimeout(async () => {
+                    const confirmed = await tronWeb.trx.getConfirmedTransaction(result);
+                    if (confirmed.ret[0].contractRet === 'SUCCESS') {
+                        alert('TRX claimed successfully! Check your wallet.');
+                        document.getElementById('status').innerText = 'TRX claimed successfully! Check your wallet.';
+                    } else {
+                        throw new Error('Transaction failed');
+                    }
+                }, 3000); // Check the transaction status after a short delay
+                await manageClaimButton(await updateClaimInterval());
+                await updateAvailableTRX();
+            } catch (error) {
+                console.error("Claim failed:", error);
+                alert('Failed to claim TRX. Please try again.');
+                document.getElementById('status').innerText = 'Claim failed, please try again.';
+                document.getElementById('claimButton').disabled = false; // Re-enable the button if the claim fails
+            }
+        });
+
+        window.onload = () => {
+            document.getElementById('status').innerText = 'Checking if TronLink is installed...';
+        };
     </script>
 </body>
 </html>
