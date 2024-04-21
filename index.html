@@ -31,13 +31,14 @@
             margin-top: 20px;
         }
         ul {
-            list-style: none;
+            list-style-type: none;
+            padding: 0;
         }
         li {
-            margin: 5px 0;
-            padding: 5px;
             background-color: #f4f4f4;
             border: 1px solid #ddd;
+            margin-top: 5px;
+            padding: 10px;
         }
     </style>
 </head>
@@ -68,59 +69,32 @@
         const claimAmountText = document.getElementById('claimAmount');
         const claimsHistory = document.getElementById('claimsHistory');
 
-        connectWalletButton.addEventListener('click', async () => {
-            if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
-                statusText.innerText = 'Wallet connected. Checking claim eligibility...';
-                connectWalletButton.innerText = 'Connected';
-                connectWalletButton.classList.add('connected');
-                connectWalletButton.disabled = true;
-                initContractInstance();
-            } else {
-                statusText.innerText = 'Please install or unlock TronLink.';
-            }
-        });
-
         async function initContractInstance() {
+            if (typeof(window.tronWeb) === 'undefined') {
+                statusText.innerText = 'TronLink is not installed!';
+                return;
+            }
             try {
                 contractInstance = await window.tronWeb.contract().at(contractAddress);
-                await updateClaimInterval();
-                await updateAvailableTRX();
-                listenToClaims();
-                checkWhitelistStatus();
+                statusText.innerText = 'Contract loaded successfully';
+                // Initialize other elements after contract is set
             } catch (error) {
                 console.error("Error initializing contract instance:", error);
                 statusText.innerText = 'Error loading the contract.';
             }
         }
 
-        async function updateClaimInterval() {
-            const interval = await contractInstance.claimInterval().call();
-            document.getElementById('claimInterval').innerText = interval / 60;
-            manageClaimButton(interval);
-        }
+        // Add other functions such as claimTRX, depositToWhitelist, and event listeners here
 
-        async function updateAvailableTRX() {
-            const availableTRX = await contractInstance.availableToClaim().call();
-            const trxAmount = availableTRX / 10**6;
-            claimAmountText.innerText = 'Available TRX to Claim: ' + trxAmount;
-        }
-
-        function listenToClaims() {
-            // Implement this method based on your contract event listening
-        }
-
-        function checkWhitelistStatus() {
-            // Implement this method to check and enable the deposit button if needed
-        }
-
-        depositButton.addEventListener('click', async () => {
-            // Implement the deposit functionality
-        });
+        // Event listeners for buttons
+        connectWalletButton.addEventListener('click', initContractInstance);
+        claimButton.addEventListener('click', claimTRX); // Implement claimTRX function
+        depositButton.addEventListener('click', depositToWhitelist); // Implement depositToWhitelist function
 
         window.onload = () => {
             statusText.innerText = 'Checking if TronLink is installed...';
             if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
-                connectWalletButton.click();
+                initContractInstance();
             }
         };
     </script>
