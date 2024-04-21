@@ -101,20 +101,34 @@
                 return;
             }
 
+            // Assume success, update UI immediately
+            document.getElementById('status').innerText = 'Processing claim...';
+            document.getElementById('claimButton').disabled = true;  // Disable the button immediately
+
             try {
                 const result = await contractInstance.claimTRX().send({
-                    shouldPollResponse: true
+                    shouldPollResponse: false
                 });
-                alert('TRX claimed successfully! Check your wallet.');
-                document.getElementById('status').innerText = 'TRX claimed successfully! Check your wallet.';
-                const interval = await updateClaimInterval();
-                manageClaimButton(interval);
-                updateAvailableTRX();
+                setTimeout(async () => {
+                    const confirmed = await tronWeb.trx.getConfirmedTransaction(result);
+                    if (confirmed.ret[0].contractRet === 'SUCCESS') {
+                        alert('TRX claimed successfully! Check your wallet.');
+                        document.getElementById('status').innerText = 'TRX claimed successfully! Check your wallet.';
+                        updateAvailableTRX(); // Update available TRX after a successful claim
+                    } else {
+                        throw new Error('Transaction failed');
+                    }
+                }, 3000);  // Check the transaction status after a short delay
             } catch (error) {
-                console.error("Error claiming TRX:", error);
-                alert('Failed to claim TRX. Make sure your wallet is connected and TronLink is unlocked.');
-                document.getElementById('status').innerText = 'Failed to claim TRX.';
+                console.error("Claim failed:", error);
+                alert('Failed to claim TRX. Please try again.');
+                document.getElementById('status').innerText = 'Claim failed, please try again.';
+                document.getElementById('claimButton').disabled = false;  // Re-enable the button if the claim fails
             }
+
+            setTimeout(() => {  // Re-enable the button based on the interval after a delay
+                manageClaimButton(await updateClaimInterval());
+            }, 500);
         });
 
         window.onload = () => {
