@@ -24,7 +24,7 @@
             cursor: pointer; 
             margin-top: 20px;
         }
-        .button:disabled { 
+        .button:disabled, .button.connected { 
             background-color: #ccc;
         }
         #status, #claimAmount {
@@ -47,13 +47,20 @@
     <script>
         let contractInstance;
         const contractAddress = 'TBa5PCpJMshASFGN15gWcKSqBPNeVP8axh';
+        const connectWalletButton = document.getElementById('connectWalletButton');
+        const claimButton = document.getElementById('claimButton');
+        const statusText = document.getElementById('status');
+        const claimAmountText = document.getElementById('claimAmount');
 
-        document.getElementById('connectWalletButton').addEventListener('click', async () => {
+        connectWalletButton.addEventListener('click', async () => {
             if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
-                document.getElementById('status').innerText = 'Wallet is connected. You can now claim TRX.';
+                statusText.innerText = 'Wallet is connected. You can now claim TRX.';
+                connectWalletButton.innerText = 'Connected'; // Change button text to 'Connected'
+                connectWalletButton.classList.add('connected'); // Optional: Change the style to indicate connected status
+                connectWalletButton.disabled = true; // Optional: Disable the connect button
                 initContractInstance();
             } else {
-                document.getElementById('status').innerText = 'Please install or unlock TronLink.';
+                statusText.innerText = 'Please install or unlock TronLink.';
             }
         });
 
@@ -65,7 +72,7 @@
                 await manageClaimButton(interval);
             } catch (error) {
                 console.error("Error initializing contract instance:", error);
-                document.getElementById('status').innerText = 'Error loading the contract.';
+                statusText.innerText = 'Error loading the contract.';
             }
         }
 
@@ -78,7 +85,7 @@
         async function updateAvailableTRX() {
             const availableTRX = await contractInstance.claimAmount().call();
             const trxAmount = availableTRX / 10**6; // Assuming TRX amount is in suns
-            document.getElementById('claimAmount').innerText = 'Available TRX to Claim: ' + trxAmount;
+            claimAmountText.innerText = 'Available TRX to Claim: ' + trxAmount;
         }
 
         async function manageClaimButton(interval) {
@@ -86,49 +93,52 @@
             const currentTime = Math.floor(Date.now() / 1000); // current time in seconds
             const timeElapsed = currentTime - lastClaimed;
             if (timeElapsed < interval) {
-                document.getElementById('claimButton').disabled = true;
+                claimButton.disabled = true;
                 setTimeout(() => {
-                    document.getElementById('claimButton').disabled = false;
+                    claimButton.disabled = false;
                 }, (interval - timeElapsed) * 1000); // Disable button for the remaining interval time
             } else {
-                document.getElementById('claimButton').disabled = false;
+                claimButton.disabled = false;
             }
         }
 
-        document.getElementById('claimButton').addEventListener('click', async () => {
-            if (!contractInstance || document.getElementById('claimButton').disabled) {
-                document.getElementById('status').innerText = 'Contract is not loaded. Connect wallet first.';
+        claimButton.addEventListener('click', async () => {
+            if (!contractInstance || claimButton.disabled) {
+                statusText.innerText = 'Contract is not loaded. Connect wallet first.';
                 return;
             }
 
-            document.getElementById('status').innerText = 'Processing claim...';
-            document.getElementById('claimButton').disabled = true; // Disable the button immediately
+            statusText.innerText = 'Processing claim...';
+            claimButton.disabled = true; // Disable the button immediately
 
             try {
                 const result = await contractInstance.claimTRX().send({
                     shouldPollResponse: true
                 });
+                // Set a timeout to allow for the transaction to be confirmed
                 setTimeout(async () => {
                     const confirmed = await tronWeb.trx.getConfirmedTransaction(result);
                     if (confirmed.ret[0].contractRet === 'SUCCESS') {
                         alert('TRX claimed successfully! Check your wallet.');
-                        document.getElementById('status').innerText = 'TRX claimed successfully! Check your wallet.';
+                        statusText.innerText = 'TRX claimed successfully! Check your wallet.';
                     } else {
                         throw new Error('Transaction failed');
                     }
                 }, 3000); // Check the transaction status after a short delay
-                await manageClaimButton(await updateClaimInterval());
-                await updateAvailableTRX();
             } catch (error) {
                 console.error("Claim failed:", error);
                 alert('Failed to claim TRX. Please try again.');
-                document.getElementById('status').innerText = 'Claim failed, please try again.';
-                document.getElementById('claimButton').disabled = false; // Re-enable the button if the claim fails
+                statusText.innerText = 'Claim failed, please try again.';
+            } finally {
+                // Always re-enable the claim button and refresh UI regardless of success or failure
+                claimButton.disabled = false;
+                await manageClaimButton(await updateClaimInterval());
+                await updateAvailableTRX();
             }
         });
 
         window.onload = () => {
-            document.getElementById('status').innerText = 'Checking if TronLink is installed...';
+            statusText.innerText = 'Checking if TronLink is installed...';
         };
     </script>
 </body>
