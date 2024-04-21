@@ -101,6 +101,7 @@
                 setTimeout(() => {
                     claimButton.disabled = false;
                     statusText.innerText = 'You can now claim TRX.';
+                    updateAvailableTRX(); // Update the available TRX after the claim interval is over
                 }, timeToNextClaim);
             }
         }
@@ -117,13 +118,14 @@
             try {
                 const result = await contractInstance.claimTRX().send({ shouldPollResponse: true });
                 statusText.innerText = 'TRX sent. Check your wallet.';
+                setTimeout(async () => {
+                    await updateAvailableTRX(); // Update the displayed TRX amount
+                    claimButton.disabled = false; // Re-enable the claim button
+                }, 3000); // Adjust this delay as needed
             } catch (error) {
                 console.error("Claim failed:", error);
                 statusText.innerText = 'Claim failed, please try again.';
-            } finally {
-                claimButton.disabled = false;
-                await updateClaimInterval();
-                await updateAvailableTRX();
+                claimButton.disabled = false; // Re-enable the claim button on error
             }
         });
 
@@ -133,3 +135,5 @@
     </script>
 </body>
 </html>
+
+        
