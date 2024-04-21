@@ -54,7 +54,8 @@
 
         connectWalletButton.addEventListener('click', async () => {
             if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
-                statusText.innerText = 'Wallet connected. You may now claim TRX.';
+                statusText.innerText = 'Wallet connected. Checking claim eligibility...';
+                connectWalletButton.innerText = 'Connected';
                 connectWalletButton.classList.add('connected');
                 connectWalletButton.disabled = true;
                 initContractInstance();
@@ -86,18 +87,22 @@
             claimAmountText.innerText = 'Available TRX to Claim: ' + trxAmount;
         }
 
-        function manageClaimButton(interval) {
-            const lastClaimed = contractInstance.lastClaimedTime().call();
-            lastClaimed.then(claimedTime => {
-                const currentTime = Math.floor(Date.now() / 1000);
-                const timeElapsed = currentTime - claimedTime;
-                if (timeElapsed < interval) {
-                    claimButton.disabled = true;
-                    setTimeout(() => claimButton.disabled = false, (interval - timeElapsed) * 1000);
-                } else {
+        async function manageClaimButton(interval) {
+            const lastClaimed = await contractInstance.lastClaimedTime().call();
+            const currentTime = Math.floor(Date.now() / 1000);
+            const timeElapsed = currentTime - lastClaimed.toNumber();
+            if (timeElapsed >= interval) {
+                claimButton.disabled = false;
+                statusText.innerText = 'You can now claim TRX.';
+            } else {
+                claimButton.disabled = true;
+                const timeToNextClaim = (interval - timeElapsed) * 1000;
+                statusText.innerText = `Please wait ${timeToNextClaim / 1000} seconds to claim again.`;
+                setTimeout(() => {
                     claimButton.disabled = false;
-                }
-            });
+                    statusText.innerText = 'You can now claim TRX.';
+                }, timeToNextClaim);
+            }
         }
 
         claimButton.addEventListener('click', async () => {
@@ -110,33 +115,20 @@
             claimButton.disabled = true;
 
             try {
-                const result = await contractInstance.claimTRX().send({ shouldPollResponse: false });
-                // Start a poller to check transaction confirmation
-                const checkTransaction = setInterval(async () => {
-                    const confirmed = await tronWeb.trx.getConfirmedTransaction(result);
-                    if (confirmed.ret[0].contractRet === 'SUCCESS') {
-                        statusText.innerText = 'TRX sent. Check your wallet.';
-                        clearInterval(checkTransaction); // Stop polling
-                        await updateAvailableTRX();
-                    } else if (confirmed.ret[0].contractRet !== 'UNKNOWN') {
-                        statusText.innerText = 'Transaction failed. Please try again.';
-                        clearInterval(checkTransaction); // Stop polling
-                    }
-                }, 1000); // Check every second
+                const result = await contractInstance.claimTRX().send({ shouldPollResponse: true });
+                statusText.innerText = 'TRX sent. Check your wallet.';
             } catch (error) {
                 console.error("Claim failed:", error);
                 statusText.innerText = 'Claim failed, please try again.';
             } finally {
                 claimButton.disabled = false;
+                await updateClaimInterval();
+                await updateAvailableTRX();
             }
         });
 
         window.onload = () => {
             statusText.innerText = 'Checking if TronLink is installed...';
-            // Attempt to automatically connect if TronLink is installed
-            if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
-                connectWalletButton.click();
-            }
         };
     </script>
 </body>
