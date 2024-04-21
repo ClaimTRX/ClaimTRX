@@ -27,19 +27,19 @@
         .button:disabled { 
             background-color: #ccc;
         }
-        img {
-            height: 50px; /* Resize the Tron logo */
+        #status, #claimAmount {
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <img src="https://tron.network/static/images/logo/tron-black.svg" alt="Tron Logo">
         <h1>TRX Giveaway</h1>
         <p>One wallet can claim TRX every <span id="claimInterval">--</span> minutes. Will you be the lucky one?</p>
         <button id="connectWalletButton" class="button">Connect TronLink Wallet</button>
         <button id="claimButton" class="button" disabled>Claim TRX</button>
         <p id="status">Please connect your TronLink wallet.</p>
+        <p id="claimAmount">Available TRX to Claim: --</p>
         <a href="https://t.me/claimyourtrx">Join our Telegram group</a>
     </div>
 
@@ -62,6 +62,7 @@
             try {
                 contractInstance = await window.tronWeb.contract().at(contractAddress);
                 updateClaimInterval();
+                updateAvailableTRX();
             } catch (error) {
                 console.error("Error initializing contract instance:", error);
                 document.getElementById('status').innerText = 'Error loading the contract.';
@@ -71,6 +72,11 @@
         async function updateClaimInterval() {
             const interval = await contractInstance.claimInterval().call();
             document.getElementById('claimInterval').innerText = interval / 60; // Assuming interval is set in seconds
+        }
+
+        async function updateAvailableTRX() {
+            const availableTRX = await contractInstance.claimAmount().call();
+            document.getElementById('claimAmount').innerText = 'Available TRX to Claim: ' + (availableTRX / 10**6); // Assuming TRX amount is in suns
         }
 
         document.getElementById('claimButton').addEventListener('click', async () => {
