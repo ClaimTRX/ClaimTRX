@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRX Giveaway</title>
+    <style>
+        /* Add your CSS styling here */
+        body { font-family: Arial, sans-serif; }
+        .container { width: 80%; margin: auto; text-align: center; padding-top: 50px; }
+        .button { padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .button:disabled { background-color: #ccc; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>TRX Giveaway</h1>
+        <button id="claimButton" class="button">Claim TRX</button>
+        <p id="status">Click the button to claim your TRX.</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/tronweb/dist/tronweb.min.js"></script>
+    <script>
+        // Add your JavaScript here
+        const tronWeb = new TronWeb({
+            fullHost: 'https://api.shasta.trongrid.io',
+            privateKey: 'your_private_key' // This should be kept secret in production
+        });
+
+        const contractAddress = 'your_contract_address';
+        let contractInstance = null;
+
+        window.onload = async () => {
+            try {
+                // Create a contract instance
+                contractInstance = await tronWeb.contract().at(contractAddress);
+
+                document.getElementById('claimButton').addEventListener('click', claimTRX);
+            } catch (error) {
+                console.error("Error:", error);
+                document.getElementById('status').innerText = 'Failed to load contract.';
+            }
+        };
+
+        async function claimTRX() {
+            try {
+                const result = await contractInstance.claimTRX().send({
+                    shouldPollResponse: true
+                });
+                document.getElementById('status').innerText = 'TRX claimed!';
+            } catch (error) {
+                console.error("Error:", error);
+                document.getElementById('status').innerText = 'Failed to claim TRX.';
+            }
+        }
+    </script>
+</body>
+</html>
