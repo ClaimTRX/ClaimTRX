@@ -67,86 +67,83 @@
         const statusText = document.getElementById('status');
         const claimAmountText = document.getElementById('claimAmount');
         const claimsHistory = document.getElementById('claimsHistory');
-        
-        // Initialize the contract instance
+        let eligibilityAmount;
+
         async function initContractInstance() {
-            try {
-                if (!window.tronWeb) {
-                    throw new Error('TronLink is not installed');
-                }
-                contractInstance = await window.tronWeb.contract().at(contractAddress);
-                statusText.innerText = 'Connected to the smart contract.';
-                updateEligibilityAmount();
-                checkWhitelistStatus();
-            } catch (error) {
-                console.error("Initialization failed:", error);
-                statusText.innerText = error.message || 'Initialization failed';
+            if (!window.tronWeb || !window.tronWeb.defaultAddress.base58) {
+                statusText.innerText = 'Please install or unlock TronLink.';
+                return;
             }
+            contractInstance = await window.tronWeb.contract().at(contractAddress);
+            statusText.innerText = 'Contract loaded. Checking eligibility...';
+            updateClaimInterval();
+            updateEligibilityAmount();
+            checkWhitelistStatus();
         }
 
-        // Update eligibility amount on the page
+        async function updateClaimInterval() {
+            const interval = await contractInstance.claimInterval().call();
+            document.getElementById('claimInterval').innerText = interval / 60;
+            claimButton.disabled = false;
+        }
+
         async function updateEligibilityAmount() {
-            try {
-                const amount = await contractInstance.eligibilityAmount().call();
-                statusText.innerText = `Eligibility amount is ${window.tronWeb.fromSun(amount)} TRX.`;
-            } catch (error) {
-                statusText.innerText = 'Failed to fetch eligibility amount.';
-            }
+            eligibilityAmount = await contractInstance.eligibilityAmount().call();
         }
 
-        // Check the whitelist status of the user
         async function checkWhitelistStatus() {
-            try {
-                const userAddress = window.tronWeb.defaultAddress.base58;
+            const userAddress = window.tronWeb.defaultAddress.base58;
+            const isWhitelistEnabled = await contractInstance.whitelistEnabled().call();
+            if (isWhitelistEnabled) {
                 const isWhitelisted = await contractInstance.whitelist(userAddress).call();
                 depositButton.disabled = isWhitelisted;
                 claimButton.disabled = !isWhitelisted;
                 statusText.innerText = isWhitelisted 
-                    ? 'You are whitelisted.' 
-                    : 'You are not whitelisted. Please deposit to whitelist.';
-            } catch (error) {
-                statusText.innerText = 'Failed to check whitelist status.';
+                    ? 'You are whitelisted and can claim TRX.'
+                    : 'You need to deposit TRX to be whitelisted.';
+            } else {
+                depositButton.disabled = true; // Deposit button should be disabled if whitelisting is not required
+                claimButton.disabled = false; // Claim button should be enabled if whitelisting is not required
+                statusText.innerText = 'Whitelisting is not required. You can claim TRX.';
             }
         }
 
-        // Claim TRX
         async function claimTRX() {
             try {
                 await contractInstance.claimTRX().send();
-                statusText.innerText = 'TRX claimed successfully.';
+                statusText.innerText = 'TRX claimed successfully!';
             } catch (error) {
-                console.error('Claiming TRX failed:', error);
-                statusText.innerText = 'Claiming TRX failed.';
+                console.error('Error claiming TRX:', error);
+                statusText.innerText = 'Failed to claim TRX. ' + error;
             }
         }
 
-        // Deposit TRX to whitelist
-        async function depositToWhitelist() {
+        depositButton.addEventListener('click', async () => {
             try {
                 await contractInstance.depositToWhitelist().send({
-                    callValue: await contractInstance.eligibilityAmount().call()
+                    callValue: eligibilityAmount
                 });
-                statusText.innerText = 'Deposit successful. You are now whitelisted.';
+                statusText.innerText = 'Deposit successful. You are now whitelisted!';
                 checkWhitelistStatus();
             } catch (error) {
-                console.error('Deposit to whitelist failed:', error);
-                statusText.innerText = 'Deposit to whitelist failed.';
-            }
-        }
-
-        // Event listeners for UI buttons
-        connectWalletButton.addEventListener('click', initContractInstance);
-        claimButton.addEventListener('click', claimTRX);
-        depositButton.addEventListener('click', depositToWhitelist);
-
-        // Listen for page load to initialize
-        window.addEventListener('load', () => {
-            if (window.tronWeb && window.tronWeb.ready) {
-                initContractInstance();
-            } else {
-                statusText.innerText = 'Waiting for TronLink...';
+                console.error('Error depositing to whitelist:', error);
+                statusText.innerText = 'Failed to deposit TRX. ' + error;
             }
         });
+
+        // Set up the connect wallet button event listener
+        connectWalletButton.addEventListener('click', initContractInstance);
+
+        // Set up the claim button event listener
+        claimButton.addEventListener('click', claimTRX);
+
+        // Initialize the contract instance when the page is fully loaded
+        window.onload = async () => {
+            statusText.innerText = 'Checking if TronLink is installed...';
+            if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
+                await initContractInstance();
+            }
+        };
     </script>
 </body>
 </html>
