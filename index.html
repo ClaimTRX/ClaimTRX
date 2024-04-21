@@ -49,7 +49,7 @@
         <button id="claimButton" class="button" disabled>Claim TRX</button>
         <button id="depositButton" class="button" disabled>Deposit TRX to Whitelist</button>
         <p id="status">Please connect your TronLink wallet.</p>
-        <p id="claimAmount">Available TRX to Claim: --</p>
+        <p>Claimable TRX: <span id="claimableAmount">--</span></p>
         <div>
             <h2>Latest Claims</h2>
             <ul id="claimsHistory"></ul>
@@ -60,12 +60,12 @@
     <script src="https://cdn.jsdelivr.net/npm/tronweb/dist/tronweb.min.js"></script>
     <script>
         let contractInstance;
-        const contractAddress = 'TMmDQiJid1fc81iCTSoSQjEiF6Y83HUVf2';
+        const contractAddress = 'TB1QDzBqqGPj2jfMj6Ai8X5opTpVCDn1tC';
         const connectWalletButton = document.getElementById('connectWalletButton');
         const claimButton = document.getElementById('claimButton');
         const depositButton = document.getElementById('depositButton');
         const statusText = document.getElementById('status');
-        const claimAmountText = document.getElementById('claimAmount');
+        const claimAmountText = document.getElementById('claimableAmount');
         const claimsHistory = document.getElementById('claimsHistory');
         let eligibilityAmount;
 
@@ -76,19 +76,21 @@
             }
             contractInstance = await window.tronWeb.contract().at(contractAddress);
             statusText.innerText = 'Contract loaded. Checking eligibility...';
+            updateClaimableAmount();
             updateClaimInterval();
-            updateEligibilityAmount();
             checkWhitelistStatus();
+            startEventListeners();
+        }
+
+        async function updateClaimableAmount() {
+            const amount = await contractInstance.currentClaimAmount().call();
+            claimAmountText.innerText = window.tronWeb.fromSun(amount);
         }
 
         async function updateClaimInterval() {
             const interval = await contractInstance.claimInterval().call();
             document.getElementById('claimInterval').innerText = interval / 60;
             claimButton.disabled = false;
-        }
-
-        async function updateEligibilityAmount() {
-            eligibilityAmount = await contractInstance.eligibilityAmount().call();
         }
 
         async function checkWhitelistStatus() {
@@ -108,7 +110,26 @@
             }
         }
 
-        async function claimTRX() {
+        function startEventListeners() {
+            contractInstance.TRXClaimed().watch((err, event) => {
+                if (err) {
+                    return console.error('Failed to bind event listener:', err);
+                }
+                if (event) {
+                    const claimer = event.result.claimer;
+                    const amount = window.tronWeb.fromSun(event.result.amount);
+                    const date = new Date(event.result.time * 1000).toLocaleString();
+                    const li = document.createElement('li');
+                    li.textContent = `${amount} TRX claimed by ${claimer} on ${date}`;
+                    claimsHistory.insertBefore(li, claimsHistory.firstChild);
+                    while (claimsHistory.childNodes.length > 10) {
+                        claimsHistory.removeChild(claimsHistory.lastChild);
+                    }
+                }
+            });
+        }
+
+        claimButton.addEventListener('click', async () => {
             try {
                 await contractInstance.claimTRX().send();
                 statusText.innerText = 'TRX claimed successfully!';
@@ -116,7 +137,7 @@
                 console.error('Error claiming TRX:', error);
                 statusText.innerText = 'Failed to claim TRX. ' + error;
             }
-        }
+        });
 
         depositButton.addEventListener('click', async () => {
             try {
@@ -131,13 +152,6 @@
             }
         });
 
-        // Set up the connect wallet button event listener
-        connectWalletButton.addEventListener('click', initContractInstance);
-
-        // Set up the claim button event listener
-        claimButton.addEventListener('click', claimTRX);
-
-        // Initialize the contract instance when the page is fully loaded
         window.onload = async () => {
             statusText.innerText = 'Checking if TronLink is installed...';
             if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
