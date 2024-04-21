@@ -6,18 +6,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TRX Giveaway</title>
     <style>
-        body { font-family: Arial, sans-serif; }
-        .container { width: 80%; margin: auto; text-align: center; padding-top: 50px; }
-        .button { padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 20px; }
-        .button:disabled { background-color: #ccc; }
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; /* Center text */
+        }
+        .container {
+            width: 80%; 
+            margin: auto; 
+            padding-top: 50px;
+        }
+        .button { 
+            padding: 10px 20px; 
+            background-color: #4CAF50; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            margin-top: 20px;
+        }
+        .button:disabled { 
+            background-color: #ccc;
+        }
+        img {
+            height: 50px; /* Resize the Tron logo */
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <img src="https://tron.network/static/images/logo/tron-black.svg" alt="Tron Logo">
         <h1>TRX Giveaway</h1>
+        <p>One wallet can claim TRX every <span id="claimInterval">--</span> minutes. Will you be the lucky one?</p>
         <button id="connectWalletButton" class="button">Connect TronLink Wallet</button>
         <button id="claimButton" class="button" disabled>Claim TRX</button>
         <p id="status">Please connect your TronLink wallet.</p>
+        <a href="https://t.me/claimyourtrx">Join our Telegram group</a>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/tronweb/dist/tronweb.min.js"></script>
@@ -38,10 +61,16 @@
         async function initContractInstance() {
             try {
                 contractInstance = await window.tronWeb.contract().at(contractAddress);
+                updateClaimInterval();
             } catch (error) {
                 console.error("Error initializing contract instance:", error);
                 document.getElementById('status').innerText = 'Error loading the contract.';
             }
+        }
+
+        async function updateClaimInterval() {
+            const interval = await contractInstance.claimInterval().call();
+            document.getElementById('claimInterval').innerText = interval / 60; // Assuming interval is set in seconds
         }
 
         document.getElementById('claimButton').addEventListener('click', async () => {
