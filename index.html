@@ -46,7 +46,7 @@
     <script src="https://cdn.jsdelivr.net/npm/tronweb/dist/tronweb.min.js"></script>
     <script>
         let contractInstance;
-        const contractAddress = 'TBa5PCpJMshASFGN15gWcKSqBPNeVP8axh';
+        const contractAddress = 'TDwBarMC1hWinvAv5nZBEe1HfWMp4GQ8Zz'; // New contract address
         const connectWalletButton = document.getElementById('connectWalletButton');
         const claimButton = document.getElementById('claimButton');
         const statusText = document.getElementById('status');
@@ -55,9 +55,9 @@
         connectWalletButton.addEventListener('click', async () => {
             if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
                 statusText.innerText = 'Wallet is connected. You can now claim TRX.';
-                connectWalletButton.innerText = 'Connected'; // Change button text to 'Connected'
-                connectWalletButton.classList.add('connected'); // Optional: Change the style to indicate connected status
-                connectWalletButton.disabled = true; // Optional: Disable the connect button
+                connectWalletButton.innerText = 'Connected';
+                connectWalletButton.classList.add('connected');
+                connectWalletButton.disabled = true;
                 initContractInstance();
             } else {
                 statusText.innerText = 'Please install or unlock TronLink.';
@@ -78,25 +78,25 @@
 
         async function updateClaimInterval() {
             const interval = await contractInstance.claimInterval().call();
-            document.getElementById('claimInterval').innerText = interval / 60; // Assuming interval is set in seconds
+            document.getElementById('claimInterval').innerText = interval / 60;
             return interval;
         }
 
         async function updateAvailableTRX() {
-            const availableTRX = await contractInstance.claimAmount().call();
-            const trxAmount = availableTRX / 10**6; // Assuming TRX amount is in suns
+            const availableTRX = await contractInstance.availableToClaim().call(); // Assuming the function is 'availableToClaim'
+            const trxAmount = availableTRX / 10**6;
             claimAmountText.innerText = 'Available TRX to Claim: ' + trxAmount;
         }
 
         async function manageClaimButton(interval) {
             const lastClaimed = await contractInstance.lastClaimedTime().call();
-            const currentTime = Math.floor(Date.now() / 1000); // current time in seconds
+            const currentTime = Math.floor(Date.now() / 1000);
             const timeElapsed = currentTime - lastClaimed;
             if (timeElapsed < interval) {
                 claimButton.disabled = true;
                 setTimeout(() => {
                     claimButton.disabled = false;
-                }, (interval - timeElapsed) * 1000); // Disable button for the remaining interval time
+                }, (interval - timeElapsed) * 1000);
             } else {
                 claimButton.disabled = false;
             }
@@ -109,28 +109,25 @@
             }
 
             statusText.innerText = 'Processing claim...';
-            claimButton.disabled = true; // Disable the button immediately
+            claimButton.disabled = true;
 
             try {
                 const result = await contractInstance.claimTRX().send({
                     shouldPollResponse: true
                 });
-                // Set a timeout to allow for the transaction to be confirmed
                 setTimeout(async () => {
                     const confirmed = await tronWeb.trx.getConfirmedTransaction(result);
                     if (confirmed.ret[0].contractRet === 'SUCCESS') {
-                        alert('TRX claimed successfully! Check your wallet.');
-                        statusText.innerText = 'TRX claimed successfully! Check your wallet.';
+                        statusText.innerText = 'TRX sent. Check your wallet.';
                     } else {
                         throw new Error('Transaction failed');
                     }
-                }, 3000); // Check the transaction status after a short delay
+                }, 3000); // Wait for the transaction to confirm
             } catch (error) {
                 console.error("Claim failed:", error);
                 alert('Failed to claim TRX. Please try again.');
                 statusText.innerText = 'Claim failed, please try again.';
             } finally {
-                // Always re-enable the claim button and refresh UI regardless of success or failure
                 claimButton.disabled = false;
                 await manageClaimButton(await updateClaimInterval());
                 await updateAvailableTRX();
