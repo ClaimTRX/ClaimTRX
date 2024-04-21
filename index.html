@@ -8,7 +8,7 @@
     <style>
         body { 
             font-family: Arial, sans-serif; 
-            text-align: center; /* Center text */
+            text-align: center;
         }
         .container {
             width: 80%; 
@@ -46,6 +46,7 @@
     <script src="https://cdn.jsdelivr.net/npm/tronweb/dist/tronweb.min.js"></script>
     <script>
         let contractInstance;
+        let lastClaimedTime = 0;
         const contractAddress = 'TBa5PCpJMshASFGN15gWcKSqBPNeVP8axh';
 
         document.getElementById('connectWalletButton').addEventListener('click', async () => {
@@ -77,28 +78,30 @@
             const availableTRX = await contractInstance.claimAmount().call();
             const trxAmount = availableTRX / 10**6; // Assuming TRX amount is in suns
             document.getElementById('claimAmount').innerText = 'Available TRX to Claim: ' + trxAmount;
-            document.getElementById('claimButton').disabled = trxAmount <= 0;
+            document.getElementById('claimButton').disabled = trxAmount <= 0 || Date.now() < lastClaimedTime + await contractInstance.claimInterval().call() * 1000;
         }
 
         document.getElementById('claimButton').addEventListener('click', async () => {
-            if (!contractInstance || document.getElementById('claimButton').disabled) {
-                document.getElementById('status').innerText = 'Contract is not loaded or no TRX available to claim. Connect wallet and ensure TRX is available.';
+            if (!contractInstance) {
+                document.getElementById('status').innerText = 'Contract is not loaded. Connect wallet first.';
                 return;
             }
 
             try {
                 const result = await contractInstance.claimTRX().send({
                     callValue: 0,
-                    shouldPollResponse: false
+                    shouldPollResponse: true
                 });
-                setTimeout(async () => {
-                    if (await tronWeb.trx.getUnconfirmedTransactionInfo(result)) {
-                        alert('TRX claimed successfully! Check your wallet.');
-                        document.getElementById('status').innerText = 'TRX claimed successfully! Check your wallet.';
-                    }
-                }, 2000);
-                document.getElementById('claimAmount').innerText = 'Available TRX to Claim: 0';
-                setTimeout(updateAvailableTRX, 1000 * 60); // Check for available TRX again after a minute
+                const receipt = await tronWeb.trx.getConfirmedTransaction(result);
+                if (receipt.ret[0].contractRet === 'SUCCESS') {
+                    alert('TRX claimed successfully! Check your wallet.');
+                    document.getElementById('status').innerText = 'TRX claimed successfully! Check your wallet.';
+                    lastClaimedTime = Date.now();
+                    document.getElementById('claimButton').disabled = true;
+                    setTimeout(updateAvailableTRX, await contractInstance.claimInterval().call() * 1000);
+                } else {
+                    throw new Error('Failed to claim TRX.');
+                }
             } catch (error) {
                 console.error("Error claiming TRX:", error);
                 alert('Failed to claim TRX. Make sure your wallet is connected and TronLink is unlocked.');
