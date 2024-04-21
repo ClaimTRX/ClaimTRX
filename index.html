@@ -86,13 +86,17 @@
             }
 
             try {
-                await contractInstance.claimTRX().send({
+                const result = await contractInstance.claimTRX().send({
                     shouldPollResponse: true
                 });
-                document.getElementById('status').innerText = 'TRX claimed successfully! Check your wallet.';
+                alert('TRX claimed successfully! Check your wallet.');
+                document.getElementById('claimAmount').innerText = 'Available TRX to Claim: 0';
+                document.getElementById('status').innerText = 'TRX claimed! Please wait for the next interval.';
+                setTimeout(updateAvailableTRX, 1000 * 60); // Check for available TRX again after a minute
             } catch (error) {
                 console.error("Error claiming TRX:", error);
-                document.getElementById('status').innerText = 'Failed to claim TRX. Make sure your wallet is connected and TronLink is unlocked.';
+                alert('Failed to claim TRX. Make sure your wallet is connected and TronLink is unlocked.');
+                document.getElementById('status').innerText = 'Failed to claim TRX.';
             }
         });
 
