@@ -6,54 +6,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TRX Giveaway</title>
     <style>
-        /* Add your CSS styling here */
         body { font-family: Arial, sans-serif; }
         .container { width: 80%; margin: auto; text-align: center; padding-top: 50px; }
-        .button { padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .button { padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 20px; }
         .button:disabled { background-color: #ccc; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>TRX Giveaway</h1>
-        <button id="claimButton" class="button">Claim TRX</button>
-        <p id="status">Click the button to claim your TRX.</p>
+        <button id="connectWalletButton" class="button">Connect TronLink Wallet</button>
+        <button id="claimButton" class="button" disabled>Claim TRX</button>
+        <p id="status">Please connect your TronLink wallet.</p>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/tronweb/dist/tronweb.min.js"></script>
     <script>
-        // Add your JavaScript here
-        const tronWeb = new TronWeb({
-            fullHost: 'https://api.shasta.trongrid.io',
-            privateKey: 'your_private_key' // This should be kept secret in production
+        let contractInstance;
+        const contractAddress = 'TBa5PCpJMshASFGN15gWcKSqBPNeVP8axh';
+
+        document.getElementById('connectWalletButton').addEventListener('click', async () => {
+            if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
+                document.getElementById('status').innerText = 'Wallet is connected. You can now claim TRX.';
+                document.getElementById('claimButton').disabled = false;
+                initContractInstance();
+            } else {
+                document.getElementById('status').innerText = 'Please install or unlock TronLink.';
+            }
         });
 
-        const contractAddress = 'your_contract_address';
-        let contractInstance = null;
-
-        window.onload = async () => {
+        async function initContractInstance() {
             try {
-                // Create a contract instance
-                contractInstance = await tronWeb.contract().at(contractAddress);
-
-                document.getElementById('claimButton').addEventListener('click', claimTRX);
+                contractInstance = await window.tronWeb.contract().at(contractAddress);
             } catch (error) {
-                console.error("Error:", error);
-                document.getElementById('status').innerText = 'Failed to load contract.';
-            }
-        };
-
-        async function claimTRX() {
-            try {
-                const result = await contractInstance.claimTRX().send({
-                    shouldPollResponse: true
-                });
-                document.getElementById('status').innerText = 'TRX claimed!';
-            } catch (error) {
-                console.error("Error:", error);
-                document.getElementById('status').innerText = 'Failed to claim TRX.';
+                console.error("Error initializing contract instance:", error);
+                document.getElementById('status').innerText = 'Error loading the contract.';
             }
         }
+
+        document.getElementById('claimButton').addEventListener('click', async () => {
+            if (!contractInstance) {
+                document.getElementById('status').innerText = 'Contract is not loaded. Connect wallet first.';
+                return;
+            }
+
+            try {
+                await contractInstance.claimTRX().send({
+                    shouldPollResponse: true
+                });
+                document.getElementById('status').innerText = 'TRX claimed successfully! Check your wallet.';
+            } catch (error) {
+                console.error("Error claiming TRX:", error);
+                document.getElementById('status').innerText = 'Failed to claim TRX. Make sure your wallet is connected and TronLink is unlocked.';
+            }
+        });
+
+        window.onload = () => {
+            document.getElementById('status').innerText = 'Checking if TronLink is installed...';
+        };
     </script>
 </body>
 </html>
