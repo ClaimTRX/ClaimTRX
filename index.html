@@ -46,7 +46,6 @@
     <script src="https://cdn.jsdelivr.net/npm/tronweb/dist/tronweb.min.js"></script>
     <script>
         let contractInstance;
-        let lastClaimedTime = 0;
         const contractAddress = 'TBa5PCpJMshASFGN15gWcKSqBPNeVP8axh';
 
         document.getElementById('connectWalletButton').addEventListener('click', async () => {
@@ -61,8 +60,9 @@
         async function initContractInstance() {
             try {
                 contractInstance = await window.tronWeb.contract().at(contractAddress);
-                updateClaimInterval();
+                const interval = await updateClaimInterval();
                 await updateAvailableTRX();
+                disableClaimButton(interval);
             } catch (error) {
                 console.error("Error initializing contract instance:", error);
                 document.getElementById('status').innerText = 'Error loading the contract.';
@@ -72,13 +72,20 @@
         async function updateClaimInterval() {
             const interval = await contractInstance.claimInterval().call();
             document.getElementById('claimInterval').innerText = interval / 60; // Assuming interval is set in seconds
+            return interval;
         }
 
         async function updateAvailableTRX() {
             const availableTRX = await contractInstance.claimAmount().call();
             const trxAmount = availableTRX / 10**6; // Assuming TRX amount is in suns
             document.getElementById('claimAmount').innerText = 'Available TRX to Claim: ' + trxAmount;
-            document.getElementById('claimButton').disabled = trxAmount <= 0 || Date.now() < lastClaimedTime + await contractInstance.claimInterval().call() * 1000;
+        }
+
+        function disableClaimButton(interval) {
+            document.getElementById('claimButton').disabled = true;
+            setTimeout(() => {
+                document.getElementById('claimButton').disabled = false;
+            }, interval * 1000); // Enable the button after the interval
         }
 
         document.getElementById('claimButton').addEventListener('click', async () => {
@@ -89,19 +96,13 @@
 
             try {
                 const result = await contractInstance.claimTRX().send({
-                    callValue: 0,
                     shouldPollResponse: true
                 });
-                const receipt = await tronWeb.trx.getConfirmedTransaction(result);
-                if (receipt.ret[0].contractRet === 'SUCCESS') {
-                    alert('TRX claimed successfully! Check your wallet.');
-                    document.getElementById('status').innerText = 'TRX claimed successfully! Check your wallet.';
-                    lastClaimedTime = Date.now();
-                    document.getElementById('claimButton').disabled = true;
-                    setTimeout(updateAvailableTRX, await contractInstance.claimInterval().call() * 1000);
-                } else {
-                    throw new Error('Failed to claim TRX.');
-                }
+                alert('TRX claimed successfully! Check your wallet.');
+                document.getElementById('status').innerText = 'TRX claimed successfully! Check your wallet.';
+                const interval = await updateClaimInterval();
+                disableClaimButton(interval);
+                updateAvailableTRX();
             } catch (error) {
                 console.error("Error claiming TRX:", error);
                 alert('Failed to claim TRX. Make sure your wallet is connected and TronLink is unlocked.');
