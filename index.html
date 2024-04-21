@@ -62,7 +62,7 @@
                 contractInstance = await window.tronWeb.contract().at(contractAddress);
                 const interval = await updateClaimInterval();
                 await updateAvailableTRX();
-                disableClaimButton(interval);
+                await manageClaimButton(interval);
             } catch (error) {
                 console.error("Error initializing contract instance:", error);
                 document.getElementById('status').innerText = 'Error loading the contract.';
@@ -81,15 +81,22 @@
             document.getElementById('claimAmount').innerText = 'Available TRX to Claim: ' + trxAmount;
         }
 
-        function disableClaimButton(interval) {
-            document.getElementById('claimButton').disabled = true;
-            setTimeout(() => {
+        async function manageClaimButton(interval) {
+            const lastClaimed = await contractInstance.lastClaimedTime().call();
+            const currentTime = Math.floor(Date.now() / 1000); // current time in seconds
+            const timeElapsed = currentTime - lastClaimed;
+            if (timeElapsed < interval) {
+                document.getElementById('claimButton').disabled = true;
+                setTimeout(() => {
+                    document.getElementById('claimButton').disabled = false;
+                }, (interval - timeElapsed) * 1000); // Disable button for the remaining interval time
+            } else {
                 document.getElementById('claimButton').disabled = false;
-            }, interval * 1000); // Enable the button after the interval
+            }
         }
 
         document.getElementById('claimButton').addEventListener('click', async () => {
-            if (!contractInstance) {
+            if (!contractInstance || document.getElementById('claimButton').disabled) {
                 document.getElementById('status').innerText = 'Contract is not loaded. Connect wallet first.';
                 return;
             }
@@ -101,7 +108,7 @@
                 alert('TRX claimed successfully! Check your wallet.');
                 document.getElementById('status').innerText = 'TRX claimed successfully! Check your wallet.';
                 const interval = await updateClaimInterval();
-                disableClaimButton(interval);
+                manageClaimButton(interval);
                 updateAvailableTRX();
             } catch (error) {
                 console.error("Error claiming TRX:", error);
