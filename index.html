@@ -3,161 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TRX Giveaway</title>
+    <title>TRX Claimer</title>
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            text-align: center;
-        }
-        .container {
-            width: 80%; 
-            margin: auto; 
-            padding-top: 50px;
-        }
-        .button { 
-            padding: 10px 20px; 
-            background-color: #4CAF50; 
-            color: white; 
-            border: none; 
-            border-radius: 5px; 
-            cursor: pointer; 
-            margin-top: 20px;
-        }
-        .button:disabled, .button.connected { 
-            background-color: #ccc;
-        }
-        #status, #claimAmount {
-            margin-top: 20px;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        li {
-            background-color: #f4f4f4;
-            border: 1px solid #ddd;
-            margin-top: 5px;
-            padding: 10px;
-        }
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        button { margin: 10px; padding: 10px 20px; }
+        #claimStatus { margin-top: 20px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>TRX Giveaway</h1>
-        <p>One wallet can claim TRX every <span id="claimInterval">--</span> minutes. Will you be the lucky one?</p>
-        <button id="connectWalletButton" class="button">Connect TronLink Wallet</button>
-        <button id="claimButton" class="button" disabled>Claim TRX</button>
-        <button id="depositButton" class="button" disabled>Deposit TRX to Whitelist</button>
-        <p id="status">Please connect your TronLink wallet.</p>
-        <p>Claimable TRX: <span id="claimableAmount">--</span></p>
-        <div>
-            <h2>Latest Claims</h2>
-            <ul id="claimsHistory"></ul>
-        </div>
-        <a href="https://t.me/claimyourtrx">Join our Telegram group</a>
-    </div>
+    <h1>TRX Claimer</h1>
+    <button id="connectWallet">Connect to TronLink</button>
+    <button id="claimTRX" disabled>Claim TRX</button>
+    <div id="claimAmount">Current Claimable Amount: 0 TRX</div>
+    <div id="claimStatus"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/tronweb/dist/tronweb.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/tronprotocol/tron-web/dist/tronweb.min.js"></script>
     <script>
-        let contractInstance;
-        const contractAddress = 'TB1QDzBqqGPj2jfMj6Ai8X5opTpVCDn1tC';
-        const connectWalletButton = document.getElementById('connectWalletButton');
-        const claimButton = document.getElementById('claimButton');
-        const depositButton = document.getElementById('depositButton');
-        const statusText = document.getElementById('status');
-        const claimAmountText = document.getElementById('claimableAmount');
-        const claimsHistory = document.getElementById('claimsHistory');
-        let eligibilityAmount;
+        const contractAddress = 'TYspoy6MiLB9HBzh37RJB91dACSwEqESmf';
+        let tronWeb;
+        let contract;
 
-        async function initContractInstance() {
-            if (!window.tronWeb || !window.tronWeb.defaultAddress.base58) {
-                statusText.innerText = 'Please install or unlock TronLink.';
-                return;
-            }
-            contractInstance = await window.tronWeb.contract().at(contractAddress);
-            statusText.innerText = 'Contract loaded. Checking eligibility...';
-            updateClaimableAmount();
-            updateClaimInterval();
-            checkWhitelistStatus();
-            startEventListeners();
-        }
-
-        async function updateClaimableAmount() {
-            const amount = await contractInstance.currentClaimAmount().call();
-            claimAmountText.innerText = window.tronWeb.fromSun(amount);
-        }
-
-        async function updateClaimInterval() {
-            const interval = await contractInstance.claimInterval().call();
-            document.getElementById('claimInterval').innerText = interval / 60;
-            claimButton.disabled = false;
-        }
-
-        async function checkWhitelistStatus() {
-            const userAddress = window.tronWeb.defaultAddress.base58;
-            const isWhitelistEnabled = await contractInstance.whitelistEnabled().call();
-            if (isWhitelistEnabled) {
-                const isWhitelisted = await contractInstance.whitelist(userAddress).call();
-                depositButton.disabled = isWhitelisted;
-                claimButton.disabled = !isWhitelisted;
-                statusText.innerText = isWhitelisted 
-                    ? 'You are whitelisted and can claim TRX.'
-                    : 'You need to deposit TRX to be whitelisted.';
-            } else {
-                depositButton.disabled = true; // Deposit button should be disabled if whitelisting is not required
-                claimButton.disabled = false; // Claim button should be enabled if whitelisting is not required
-                statusText.innerText = 'Whitelisting is not required. You can claim TRX.';
-            }
-        }
-
-        function startEventListeners() {
-            contractInstance.TRXClaimed().watch((err, event) => {
-                if (err) {
-                    return console.error('Failed to bind event listener:', err);
-                }
-                if (event) {
-                    const claimer = event.result.claimer;
-                    const amount = window.tronWeb.fromSun(event.result.amount);
-                    const date = new Date(event.result.time * 1000).toLocaleString();
-                    const li = document.createElement('li');
-                    li.textContent = `${amount} TRX claimed by ${claimer} on ${date}`;
-                    claimsHistory.insertBefore(li, claimsHistory.firstChild);
-                    while (claimsHistory.childNodes.length > 10) {
-                        claimsHistory.removeChild(claimsHistory.lastChild);
-                    }
-                }
-            });
-        }
-
-        claimButton.addEventListener('click', async () => {
-            try {
-                await contractInstance.claimTRX().send();
-                statusText.innerText = 'TRX claimed successfully!';
-            } catch (error) {
-                console.error('Error claiming TRX:', error);
-                statusText.innerText = 'Failed to claim TRX. ' + error;
-            }
-        });
-
-        depositButton.addEventListener('click', async () => {
-            try {
-                await contractInstance.depositToWhitelist().send({
-                    callValue: eligibilityAmount
-                });
-                statusText.innerText = 'Deposit successful. You are now whitelisted!';
-                checkWhitelistStatus();
-            } catch (error) {
-                console.error('Error depositing to whitelist:', error);
-                statusText.innerText = 'Failed to deposit TRX. ' + error;
-            }
-        });
-
-        window.onload = async () => {
-            statusText.innerText = 'Checking if TronLink is installed...';
+        const connectWallet = async () => {
             if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
-                await initContractInstance();
+                tronWeb = window.tronWeb;
+                contract = await tronWeb.contract().at(contractAddress);
+                updateClaimableAmount();
+                document.getElementById('claimTRX').disabled = false;
+            } else {
+                setTimeout(connectWallet, 1000);
             }
         };
+
+        const claimTRX = async () => {
+            try {
+                const result = await contract.claimTRX().send({
+                    shouldPollResponse: true
+                });
+                document.getElementById('claimStatus').innerText = 'Success! TRX claimed.';
+                updateClaimableAmount();
+            } catch (error) {
+                document.getElementById('claimStatus').innerText = 'Error: ' + error.message;
+            }
+        };
+
+        const updateClaimableAmount = async () => {
+            const amount = await contract.getClaimableAmount().call();
+            document.getElementById('claimAmount').innerText = `Current Claimable Amount: ${amount} TRX`;
+            document.getElementById('claimTRX').disabled = amount <= 0;
+        };
+
+        document.getElementById('connectWallet').addEventListener('click', connectWallet);
+        document.getElementById('claimTRX').addEventListener('click', claimTRX);
+
+        connectWallet(); // Auto-connect on page load
     </script>
 </body>
 </html>
