@@ -21,7 +21,7 @@
 
     <script src="https://cdn.jsdelivr.net/gh/tronprotocol/tron-web/dist/tronweb.min.js"></script>
     <script>
-        const contractAddress = 'TYspoy6MiLB9HBzh37RJB91dACSwEqESmf';
+        const contractAddress = 'TBL1rMk342Zo2CijckEaHXDzd9mNdXiRtP';
         let tronWeb;
         let contract;
 
@@ -34,7 +34,7 @@
                 updateClaimableAmount();
                 setInterval(updateClaimableAmount, 10000); // Poll every 10 seconds
             } else {
-                setTimeout(connectWallet, 1000);
+                alert("Please install TronLink.");
             }
         };
 
@@ -53,19 +53,12 @@
         const updateClaimableAmount = async () => {
             const amount = await contract.getClaimableAmount().call();
             document.getElementById('claimAmount').innerText = `Current Claimable Amount: ${amount} TRX`;
-            if (amount > 0) {
-                document.getElementById('claimTRX').disabled = false;
-                document.getElementById('claimTRX').classList.add('claimable');
-            } else {
-                document.getElementById('claimTRX').disabled = true;
-                document.getElementById('claimTRX').classList.remove('claimable');
-            }
+            document.getElementById('claimTRX').disabled = amount <= 0;
+            document.getElementById('claimTRX').classList.toggle('claimable', amount > 0);
         };
 
         document.getElementById('connectWallet').addEventListener('click', connectWallet);
         document.getElementById('claimTRX').addEventListener('click', claimTRX);
-
-        connectWallet(); // Auto-connect on page load
     </script>
 </body>
 </html>
