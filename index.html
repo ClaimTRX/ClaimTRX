@@ -6,7 +6,9 @@
     <title>TRX Claimer</title>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-        button { margin: 10px; padding: 10px 20px; }
+        button { margin: 10px; padding: 10px 20px; cursor: pointer; }
+        .connected { background-color: #4CAF50; color: white; }
+        .claimable { background-color: #4CAF50; color: white; }
         #claimStatus { margin-top: 20px; }
     </style>
 </head>
@@ -27,8 +29,10 @@
             if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
                 tronWeb = window.tronWeb;
                 contract = await tronWeb.contract().at(contractAddress);
+                document.getElementById('connectWallet').classList.add('connected');
+                document.getElementById('connectWallet').textContent = 'Connected';
                 updateClaimableAmount();
-                document.getElementById('claimTRX').disabled = false;
+                setInterval(updateClaimableAmount, 10000); // Poll every 10 seconds
             } else {
                 setTimeout(connectWallet, 1000);
             }
@@ -49,7 +53,13 @@
         const updateClaimableAmount = async () => {
             const amount = await contract.getClaimableAmount().call();
             document.getElementById('claimAmount').innerText = `Current Claimable Amount: ${amount} TRX`;
-            document.getElementById('claimTRX').disabled = amount <= 0;
+            if (amount > 0) {
+                document.getElementById('claimTRX').disabled = false;
+                document.getElementById('claimTRX').classList.add('claimable');
+            } else {
+                document.getElementById('claimTRX').disabled = true;
+                document.getElementById('claimTRX').classList.remove('claimable');
+            }
         };
 
         document.getElementById('connectWallet').addEventListener('click', connectWallet);
