@@ -54,10 +54,11 @@
         };
 
         const updateClaimableAmount = async () => {
-            const amount = await contract.getClaimableAmount().call();
-            document.getElementById('claimAmount').innerText = `Current Claimable Amount: ${amount} TRX`;
-            document.getElementById('claimTRX').disabled = amount <= 0;
-            document.getElementById('claimTRX').classList.toggle('claimable', amount > 0);
+            const amountInSuns = await contract.getClaimableAmount().call();
+            const amountInTRX = tronWeb.fromSun(amountInSuns);
+            document.getElementById('claimAmount').innerText = `Current Claimable Amount: ${amountInTRX} TRX`;
+            document.getElementById('claimTRX').disabled = amountInSuns <= 0;
+            document.getElementById('claimTRX').classList.toggle('claimable', amountInSuns > 0);
         };
 
         document.getElementById('connectWallet').addEventListener('click', connectWallet);
