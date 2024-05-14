@@ -232,15 +232,16 @@ input[type="text"] { /* Styles specifically for text input fields */
             }
         }
 
-        async function claimTRX() {
-            try {
-                await contract.claimTRX().send();
-                alert('TRX successfully claimed!');
-                await updateUIStates();
-            } catch (error) {
-                alert('Error: ' + error.message);
-            }
-        }
+       async function claimTRX() {
+    try {
+        await contract.claimTRX().send();
+        // No feedback provided
+        await updateUIStates();
+    } catch (error) {
+        console.error('Error: ' + error.message); // Use console.log for error debugging
+    }
+}
+
 
         async function donateTRX() {
             const amountToDonate = tronWeb.toSun(document.getElementById('donationAmount').value);
