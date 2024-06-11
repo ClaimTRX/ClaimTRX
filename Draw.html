@@ -6,76 +6,161 @@
     <title>TRX Draw</title>
     <style>
         body { 
-            font-family: Arial, sans-serif; 
             text-align: center; 
+            font-family: Arial, sans-serif; 
+            background-color: #f5f5f5; 
+            color: #333; 
             padding: 20px; 
-            background-color: #f2f2f2;
+        }
+        #container {
+            background: white; 
+            border-radius: 5px; 
+            padding: 20px; 
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
+            display: inline-block; 
+            width: 100%; 
+            max-width: 400px; 
+        }
+        h1 { 
+            color: #007bff; 
+        }
+        #links {
+            margin: 20px 0; 
+        }
+        a { 
+            display: block; 
+            margin: 5px 0; 
+            color: #007bff; 
+            text-decoration: none; 
+        }
+        a:hover { 
+            text-decoration: underline; 
         }
         button { 
-            margin: 10px; 
-            padding: 20px 30px;
+            width: calc(100% - 22px); 
+            margin: 10px 0; 
+            padding: 10px; 
+            font-size: 16px; 
+            background-color: #007bff; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
             cursor: pointer; 
-            border-radius: 8px;
-            border: none;
-            background-color: #4CAF50; 
-            color: white;
-            font-size: 16px;
         }
-        .hidden { 
-            display: none;
+        button:hover { 
+            background-color: #0056b3; 
         }
         .disabled { 
             background-color: #ccc; 
-            color: #666;
-            cursor: not-allowed;
+            color: #666; 
+            cursor: not-allowed; 
         }
         .warning { 
             color: red; 
-            font-size: 20px;
-        }
-        #appContent, #logoContainer, #energyWarning {
-            display: none;
-            margin-top: 40px;
+            font-size: 20px; 
         }
         #timer, #prizeAmount, #lastWinner, #intervalInfo, #warningMessage {
-            margin: 15px 0;
+            margin: 15px 0; 
         }
-        #logo {
-            width: 300px;
-            height: 250px;
-            object-fit: cover;
+        #logo { 
+            width: 100%; 
+            height: auto; 
+            object-fit: cover; 
+            margin-top: 20px; 
         }
-        #visitText {
-            font-weight: bold;
-            font-size: 18px;
-            margin-bottom: 10px;
+        #visitText { 
+            font-weight: bold; 
+            font-size: 18px; 
+            margin-bottom: 10px; 
+        }
+        .dropdown {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .dropdown:hover .dropbtn {
+            background-color: #0056b3;
+        }
+        .dropbtn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 200px; /* Ensure width matches the Connect Wallet button */
+        }
+        .dropbtn:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
-    <a href="index.html">Go to claim Page</a> <a href="TRC20.html">Go to TRC20 Page</a>
-    <h1>TRX Draw</h1>
-    <button id="connectWallet">Connect Wallet</button>
-    <div id="warningMessage" class="hidden warning">
-        Contact <a href="https://t.me/Stian_86">Stian_86 on Telegram</a> to be whitelisted for this page.
+    <div id="container">
+        <h1>TRX Draw</h1>
+        <div id="buttonContainer">
+            <div class="dropdown">
+                <button class="dropbtn">Menu</button>
+                <div class="dropdown-content">
+                   <a href="index.html">Home</a>
+                    <a href="CFTToken.html">Buy CFT</a>
+                    <a href="staking.html">Staking</a>
+                     <a href="Marketplace.html">Marketplace</a>
+                    <a href="Claim.html">Claim</a>
+                    <a href="TRC20.html">TRC20</a>
+                </div>
+        </div>
+        <button id="connectWallet">Connect Wallet</button>
+        <div id="warningMessage" class="hidden warning">
+            Contact <a href="https://t.me/Stian_86">Stian_86 on Telegram</a> to be whitelisted for this page.
+        </div>
+        <div id="statusMessage" class="warning hidden"></div>
+        <div id="appContent">
+            <button id="register" class="disabled" disabled>Register</button>
+            <button id="draw" class="disabled" disabled>Draw Winner</button>
+            
+            <div id="timer">Next draw in: --:--:--</div>
+            <div id="prizeAmount">Current prize: 0 TRX</div>
+            <div id="lastWinner">Last winner: None</div>
+            <div id="intervalInfo">Press Register to win <span id="prizeDisplay">--</span> every <span id="intervalDisplay">--</span> hours. Remember to register for each round!</div>
+            <div><p>Contract owner pays energy fees. Only bandwidth cost will be taken from user</p></div>
+        </div>
+        <div id="logoContainer">
+            <p id="visitText">Visit the new Just.Money Explorer</p>
+            <a href="https://explorer.just.money/" target="_blank" rel="noopener noreferrer">
+                <img id="logo" src="https://github.com/ClaimTRX/Test/blob/main/JustMoneyLogo.jpg?raw=true" alt="Just Money Logo">
+            </a>
+        </div>
     </div>
-    <div id="statusMessage" class="warning hidden"></div>
-    <div id="appContent">
-        <button id="register" class="disabled" disabled>Register</button>
-        <button id="draw" class="disabled" disabled>Draw Winner</button>
-        
-        <div id="timer">Next draw in: --:--:--</div>
-        <div id="prizeAmount">Current prize: 0 TRX</div>
-        <div id="lastWinner">Last winner: None</div>
-        <div id="intervalInfo">Press Register to win <span id="prizeDisplay">--</span> every <span id="intervalDisplay">--</span> hours. Remember to register for each round!</div>
-        <div><p>Contract owner pays energy fees. Only bandwidth cost will be taken from user</p></div>
-    </div>
-    <div id="logoContainer">
-        <p id="visitText">Visit the new Just.Money Explorer</p>
-        <a href="https://explorer.just.money/" target="_blank" rel="noopener noreferrer">
-            <img id="logo" src="https://github.com/ClaimTRX/Test/blob/main/JustMoneyLogo.jpg?raw=true" alt="Just Money Logo">
-        </a>
-    </div>
+</body>
+</html>
+
+
     <script src="https://cdn.jsdelivr.net/gh/tronprotocol/tron-web/dist/tronweb.min.js"></script>
     <script>
         const contractAddress = 'TVHKzE54md38r2yLEJ9qxfaHtA51J3XgBw';
