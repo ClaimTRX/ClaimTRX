@@ -318,23 +318,25 @@
         }
 
         async function connectWallet() {
-            try {
-                await initializeTronWeb();
-                const walletAddress = tronWeb.defaultAddress.base58;
-                if (walletAddress) {
-                    document.getElementById('walletAddress').innerText = walletAddress;
-                    document.getElementById('walletInfo').style.display = 'block';
-                    document.getElementById('actions').style.display = 'block';
-                    document.getElementById('marketplace').style.display = 'block';
-                    fetchListings();
-                } else {
-                    alert('Please log in to TronLink.');
-                }
-            } catch (error) {
-                console.error(error);
-                alert('Failed to connect to TronLink.');
-            }
+    try {
+        await initializeTronWeb();
+        const walletAddress = tronWeb.defaultAddress.base58;
+        if (walletAddress) {
+            document.getElementById('walletAddress').innerText = walletAddress;
+            document.getElementById('walletInfo').style.display = 'block';
+            document.getElementById('actions').style.display = 'block';
+            document.getElementById('marketplace').style.display = 'block';
+            document.getElementById('connectWallet').innerText = 'Wallet Connected';
+            fetchListings();
+        } else {
+            alert('Please log in to TronLink.');
         }
+    } catch (error) {
+        console.error(error);
+        alert('Failed to connect to TronLink.');
+    }
+}
+
 
         async function approveTokens() {
             const tokenAmount = document.getElementById('tokenAmount').value;
