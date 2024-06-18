@@ -289,16 +289,18 @@
         ]; // Replace with your TRC20 token contract ABI
 
         async function connectWallet() {
-            if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
-                tronWeb = window.tronWeb;
-                $('#walletAddress').text(tronWeb.defaultAddress.base58);
-                $('#walletInfo').show();
-                $('#actions').show();
-                await updateTokenBalance();
-            } else {
-                alert('Please install TronLink wallet!');
-            }
-        }
+    if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
+        tronWeb = window.tronWeb;
+        $('#walletAddress').text(tronWeb.defaultAddress.base58);
+        $('#walletInfo').show();
+        $('#actions').show();
+        $('#connectWallet').text('Wallet Connected');
+        await updateTokenBalance();
+    } else {
+        alert('Please install TronLink wallet!');
+    }
+}
+
 
         async function updateTokenBalance() {
             const walletAddress = tronWeb.defaultAddress.base58;
