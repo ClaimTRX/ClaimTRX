@@ -60,7 +60,7 @@
             color: red; 
             font-size: 20px; 
         }
-        #timer, #prizeAmount, #registeredUsers, #intervalInfo, #warningMessage {
+        #timer, #prizeAmount, #intervalInfo, #warningMessage {
             margin: 15px 0; 
         }
         #logo { 
@@ -149,9 +149,9 @@
                 <div id="timer">Next draw in: --:--:--</div>
                 <div id="prizeAmount">Current prize: 0 TOKEN</div>
                 <div id="visitText"><a href="https://explorer.just.money/address/TAGnb4n6Bbr1RATQ43FaQhfoFVm2ELyWY8" target="_blank" rel="noopener noreferrer">Contract</a></div>
-                <div id="intervalInfo">Press Register to win <span id="prizeDisplay">--</span> every <span id="intervalDisplay">--</span> hours. Remember to register for each round!</div>
+                <div id="intervalInfo">Press Register to win every <span id="intervalDisplay">--</span> hours. Remember to register for each round!</div>
                 <div><p>Contract owner pays energy fees. Only bandwidth cost will be taken from user</p></div>
-                <div id="visitText"><a href="https://explorer.just.money/" target="_blank" rel="noopener noreferrer">Visit the new Just.Money Explorer</a></div>
+                <div id="visitText"><a href="https://explorer.just.money/dapp/42" target="_blank" rel="noopener noreferrer">Visit the new Just.Money Explorer</a></div>
             </div>
             <div id="logoContainer">
                 <a href="https://explorer.just.money/dapp/42" target="_blank" rel="noopener noreferrer">
@@ -168,6 +168,7 @@
 <script>
     const contractAddress = 'TAGnb4n6Bbr1RATQ43FaQhfoFVm2ELyWY8';
     const cftTokenAddress = 'TAQzALyftaynnr3VG3rCvzkY2KouFH79sA'; // CFT token contract address
+    const decimals = 8; // Number of decimals for the prize token
     let tronWeb;
     let contract;
     let prizeToken;
@@ -266,7 +267,6 @@
             setInterval(() => {
                 updateTimer();
                 updatePrizeAmount();
-                updateRegisteredUsers();
             }, 1000);
 
             await updateRegistrationDetails();
@@ -274,15 +274,6 @@
             console.error("Data Updates Error: ", error.message);
             document.getElementById('statusMessage').textContent = "An error occurred while updating data.";
             document.getElementById('statusMessage').classList.remove('hidden');
-        }
-    }
-
-    async function updateRegisteredUsers() {
-        try {
-            const registeredUsers = await contract.participants().call();
-            document.getElementById('registeredUsers').innerText = `Registered users: ${registeredUsers.length}`;
-        } catch (error) {
-            console.error("Registered Users Update Error:", error.message);
         }
     }
 
@@ -310,11 +301,21 @@
         }
     }
 
+    function formatNumberWithCommas(number) {
+        // Check if the number is a whole number (i.e., ends in ".00")
+        const numberParts = number.split(".");
+        if (numberParts[1] === "00") {
+            number = numberParts[0];
+        }
+        return number.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
     async function updatePrizeAmount() {
         try {
             const prizeAmount = parseInt(await contract.prizeAmount().call());
             const tokenName = await getTokenName();
-            document.getElementById('prizeAmount').innerText = `Current prize: ${tronWeb.fromSun(prizeAmount)} ${tokenName}`;
+            const formattedPrizeAmount = formatNumberWithCommas((prizeAmount / 10**decimals).toFixed(2));
+            document.getElementById('prizeAmount').innerText = `Current prize: ${formattedPrizeAmount} ${tokenName}`;
         } catch (error) {
             console.error("Prize Amount Update Error: ", error.message);
         }
@@ -323,11 +324,12 @@
     async function updateRegistrationDetails() {
         try {
             const interval = parseInt(await contract.interval().call()) / 3600;
-            const prizeAmount = tronWeb.fromSun(parseInt(await contract.prizeAmount().call()));
+            const prizeAmount = parseInt(await contract.prizeAmount().call());
             const tokenName = await getTokenName();
+            const formattedPrizeAmount = formatNumberWithCommas((prizeAmount / 10**decimals).toFixed(2));
 
             document.getElementById('intervalDisplay').innerText = `${interval}`;
-            document.getElementById('prizeDisplay').innerText = `${prizeAmount} ${tokenName}`;
+            document.getElementById('prizeDisplay').innerText = `${formattedPrizeAmount} ${tokenName}`;
         } catch (error) {
             console.error("Registration Details Update Error:", error.message);
         }
