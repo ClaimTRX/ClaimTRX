@@ -9,7 +9,6 @@
     <meta property="og:image" content="https://github.com/ClaimTRX/Test/blob/main/affiliateProgramEnglish.png?raw=true">
     <meta property="og:url" content="YOUR_URL_HERE">
     <title>TRC20 Token Claimer</title>
-    <link rel="icon" href="https://raw.githubusercontent.com/ClaimTRX/Test/main/favicon-32x32.png" type="image/png">
     <style>
         body { 
             text-align: center; 
@@ -154,14 +153,12 @@
             <div class="dropdown">
                 <button class="dropbtn">Menu</button>
                 <div class="dropdown-content">
-                  <a href="index.html">Home</a>
-                <a href="CFTToken.html">Buy CFT</a>
-                <a href="newstaking.html">Staking</a>
-                <a href="marketplace.html">Marketplace</a>
-                <a href="claim.html">Claim</a>
-                <a href="draw.html">Draw</a>
-                <a href="TRC20.html">TRC20 Claim</a>
-                    <a href="TRC20Draw.html">TRC20 Draw</a>
+                   <a href="index.html">Home</a>
+                    <a href="CFTToken.html">Buy CFT</a>
+                    <a href="staking.html">Staking</a>
+                     <a href="Marketplace.html">Marketplace</a>
+                    <a href="Claim.html">Claim</a>
+                    <a href="Draw.html">Draw</a>
                 </div>
             </div>
             <button id="connectWallet">Connect Wallet</button>
@@ -638,21 +635,28 @@
             }
         }
 
-        async function updateClaimableAmounts() {
-            try {
-                const tokenAddresses = await contract.getTokenAddresses().call();
+       function formatNumberWithCommas(number) {
+        return number.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
 
-                for (let i = 0; i < tokenAddresses.length; i++) {
-                    const claimableAmount = await contract.getClaimableAmount(tokenAddresses[i]).call();
-                    const tokenInfo = await contract.tokens(tokenAddresses[i]).call();
-                    const decimals = tokenInfo.decimals;
-                    const accumulatedTokens = (claimableAmount / (10 ** decimals)).toFixed(0); // Show whole number
-                    document.getElementById(`claimableAmount${i}`).innerText = `Claimable Amount: ${accumulatedTokens}`;
-                }
-            } catch (error) {
-                console.error('Error updating claimable amounts:', error);
+    async function updateClaimableAmounts() {
+        try {
+            const tokenAddresses = await contract.getTokenAddresses().call();
+
+            for (let i = 0; i < tokenAddresses.length; i++) {
+                const claimableAmount = await contract.getClaimableAmount(tokenAddresses[i]).call();
+                const tokenInfo = await contract.tokens(tokenAddresses[i]).call();
+                const decimals = tokenInfo.decimals;
+                const accumulatedTokens = (claimableAmount / (10 ** decimals)).toFixed(0); // Show whole number
+                const formattedTokens = formatNumberWithCommas(accumulatedTokens.toString());
+                document.getElementById(`claimableAmount${i}`).innerText = `Claimable Amount: ${formattedTokens}`;
             }
+        } catch (error) {
+            console.error('Error updating claimable amounts:', error);
         }
+    }
+
+
 
         async function updateCooldownTimer() {
             try {
