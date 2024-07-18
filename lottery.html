@@ -472,21 +472,21 @@
         }
 
         async function buyTickets() {
-            try {
-                const amount = document.getElementById('ticketAmount').value;
-                const ticketPrice = await contract.methods.ticketPrice().call();
-                const totalCost = ticketPrice * amount;
+    try {
+        const amount = document.getElementById('ticketAmount').value;
+        const ticketPrice = await contract.methods.ticketPrice().call();
+        const totalCost = ticketPrice * amount;
 
-                await contract.methods.buyTickets(amount).send({
-                    from: tronWeb.defaultAddress.base58,
-                    callValue: totalCost
-                });
+        await contract.methods.buyTickets(amount).send({
+            callValue: totalCost
+        });
 
-                setTimeout(updateLotteryUI, 3000);
-            } catch (error) {
-                console.error('Error buying tickets:', error);
-            }
-        }
+        setTimeout(updateLotteryUI, 3000);
+    } catch (error) {
+        console.error('Error buying tickets:', error);
+    }
+}
+
 
         async function drawWinner() {
             try {
