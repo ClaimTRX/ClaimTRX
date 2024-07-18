@@ -447,6 +447,15 @@
             }
         }
 
+         function switchLanguage(language) {
+    if (language === 'zh') {
+      window.location.href = 'lottery_zh.html';
+    } else {
+      window.location.href = 'lottery.html';
+    }
+  }
+
+
         async function updateTicketCount(account) {
             try {
                 const ticketsCount = await contract.methods.getTickets(account).call();
