@@ -1330,7 +1330,7 @@ async function stakeTokens(amount) {
         document.getElementById('staked-amount').innerText = formatWholeNumber(tronWeb.fromSun(newStakedAmount)) + ' CFT';
     } catch (error) {
         console.error('Error staking tokens:', error);
-    }
+    
 }
 
     await stakingContract.methods.stake(amountToStake).send();
@@ -1362,7 +1362,7 @@ async function buyTokens(amount) {
         document.getElementById('available-trx').innerText = 'Available TRX: ' + formatNumber(tronWeb.fromSun(newBalance)) + ' TRX';
     } catch (error) {
         console.error('Error buying tokens:', error);
-    }
+    
 }
 
 async function compoundRewards() {
