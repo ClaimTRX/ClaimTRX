@@ -458,6 +458,15 @@
                 console.error('获取票数时出错:', error);
             }
         }
+        
+        function switchLanguage(language) {
+    if (language === 'zh') {
+      window.location.href = 'lottery_zh.html';
+    } else {
+      window.location.href = 'lottery.html';
+    }
+  }
+
 
         async function buyTickets() {
             try {
