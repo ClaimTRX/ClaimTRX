@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Coming Soon</title>
+  <title>CFT</title>
   <link rel="icon" href="https://raw.githubusercontent.com/ClaimTRX/Test/main/favicon-32x32.png" type="image/png">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
@@ -38,6 +38,22 @@
       background-color: #1f4068;
     }
 
+    .sidebar .social-links {
+      display: flex;
+      margin-top: 20px;
+    }
+
+    .sidebar .social-icon {
+      color: white;
+      font-size: 20px;
+      margin-right: 10px;
+      text-decoration: none;
+    }
+
+    .sidebar .social-icon:last-child {
+      margin-right: 0;
+    }
+
     .topbar {
       background-color: #162447;
       padding: 10px;
@@ -61,33 +77,63 @@
     .main-content {
       margin-left: 220px;
       padding: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: calc(100vh - 60px);
     }
 
-    .coming-soon {
-      font-size: 4rem;
-      font-weight: bold;
-      text-align: center;
-    }
-
-    .sidebar .social-links {
-      display: flex;
-      justify-content: center;
-      margin-top: 20px;
-    }
-
-    .sidebar .social-icon {
+    .card {
+      background-color: #2c3e50;
       color: white;
-      font-size: 20px;
-      margin-right: 10px;
-      text-decoration: none;
+      border: none;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
     }
 
-    .sidebar .social-icon:last-child {
-      margin-right: 0;
+    .card-body {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      margin-right: 20px;
+    }
+
+    .card-title {
+      font-size: 1.5rem;
+    }
+
+    .btn-success {
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      padding: 8px 16px;
+      width: 20%;
+      margin-top: 10px;
+    }
+
+    .form-control {
+      width: 20%;
+      padding: 8px;
+      font-size: 0.875rem;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+
+    .form-control[type=number] {
+      -moz-appearance: textfield;
+    }
+
+    .form-control[type=number]::-webkit-outer-spin-button,
+    .form-control[type=number]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .card-explanation {
+      flex: 1;
+      font-size: 0.875rem;
     }
 
     @media (max-width: 767.98px) {
@@ -108,105 +154,541 @@
 
       .main-content {
         margin-left: 0;
-        height: auto;
-        display: block;
       }
 
-      .coming-soon {
-        font-size: 2rem;
+      .card {
+        flex-direction: column;
       }
 
-      .sidebar .social-icon {
-        margin-bottom: 10px;
+      .card-body {
+        margin-right: 0;
+      }
+
+      .btn-success, .form-control {
+        width: 100%;
       }
 
       .sidebar .social-links {
         justify-content: center;
+      }
+
+      .sidebar .social-icon {
+        margin-bottom: 10px;
       }
     }
   </style>
 </head>
 <body>
   <div class="sidebar">
-    <h2>CFT</h2>
-    <a href="index.html">CFT Token</a>
+    <h2>Claim</h2>
+   <a href="index.html">CFT Token</a>
     <a href="lottery.html">Lottery</a>
     <a href="draw.html">Draw</a>
-    <a href="claim.html">Claim (Coming Soon)</a>
+    <a href="claim.html">Claim</a>
     <div class="social-links">
-      <a href="https://x.com/cfttrc20?s=21" target="_blank" class="social-icon">
-        <i class="fab fa-twitter"></i>
-      </a>
-      <a href="https://t.me/claimfreetrxnow" target="_blank" class="social-icon">
-        <i class="fab fa-telegram-plane"></i>
-      </a>
+      <a href="https://twitter.com" target="_blank" class="social-icon"><i class="fab fa-twitter"></i></a>
+      <a href="https://telegram.org" target="_blank" class="social-icon"><i class="fab fa-telegram-plane"></i></a>
     </div>
     <div class="language-switcher">
-      <button id="language-switcher" class="btn btn-secondary" onclick="switchLanguage('zh')">中文</button>
-    </div>
+    <button id="language-switcher" class="btn btn-secondary" onclick="switchLanguage('zh')">中文</button>
+  </div>
   </div>
   <div class="topbar">
-    <button id="connect-button" onclick="connectWallet()">Connect Wallet</button>
+    <button id="connect-button" class="btn btn-secondary" onclick="connectWallet()">Connect Wallet</button>
   </div>
   <div class="main-content">
-    <div class="coming-soon">Coming Soon</div>
+    <h1>Claim TRX</h1>
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Claimable Amount: <span id="claimable-amount">0 TRX</span></h5>
+        <input type="text" id="tg-username" class="form-control" placeholder="Your Telegram username">
+        <input type="number" id="claim-amount" class="form-control" placeholder="Enter claim amount">
+        <button id="claim-button" class="btn btn-success">Claim</button>
+        <p id="cooldown-warning" style="color: red;"></p>
+      </div>
+      <div class="card-explanation">
+        <p>Claim TRX by entering your Telegram username and the amount to claim. Make sure to connect your wallet first.</p>
+        <p>Energy cost is taken from the contract owner, remember to activate your wallet first.</p>
+        <p>Users cought cheating may risk to be blacklisted from the entire CFT Ecosystem.</p>
+      </div>
+    </div>
   </div>
+
   <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tronweb/dist/TronWeb.min.js"></script>
   <script>
-    let tronWeb, userAddress;
-
-    document.addEventListener('DOMContentLoaded', async () => {
-      if (await checkTronLinkInstalled()) {
-        await initializeTronWeb();
-      }
-    });
-
-    async function checkTronLinkInstalled() {
-      return new Promise((resolve) => {
-        const interval = setInterval(() => {
-          if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
-            clearInterval(interval);
-            resolve(true);
-          }
-        }, 1000);
-      });
+    const contractAbi = [
+    {
+        "inputs": [],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "user",
+                "type": "address"
+            }
+        ],
+        "name": "addToBlacklist",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "user",
+                "type": "address"
+            }
+        ],
+        "name": "removeFromBlacklist",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "userIP",
+                "type": "string"
+            }
+        ],
+        "name": "blockIP",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "userIP",
+                "type": "string"
+            }
+        ],
+        "name": "unblockIP",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "userIP",
+                "type": "string"
+            }
+        ],
+        "name": "isIPBlocked",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "tgUsername",
+                "type": "string"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "userIP",
+                "type": "string"
+            }
+        ],
+        "name": "claimTRX",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getClaimableAmount",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "user",
+                "type": "address"
+            }
+        ],
+        "name": "lastClaimTime",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "cooldownPeriod",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_minMinutes",
+                "type": "uint256"
+            }
+        ],
+        "name": "setMinClaimPeriod",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_maxMinutes",
+                "type": "uint256"
+            }
+        ],
+        "name": "setMaxClaimPeriod",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_cooldownMinutes",
+                "type": "uint256"
+            }
+        ],
+        "name": "setCooldownPeriod",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "withdraw",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "user",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "claimTime",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "timeSinceLastClaim",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "tgUsername",
+                "type": "string"
+            },
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "userIP",
+                "type": "string"
+            }
+        ],
+        "name": "Claim",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "user",
+                "type": "address"
+            }
+        ],
+        "name": "Blacklisted",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "user",
+                "type": "address"
+            }
+        ],
+        "name": "RemovedFromBlacklist",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "string",
+                "name": "userIP",
+                "type": "string"
+            }
+        ],
+        "name": "IPBlocked",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "string",
+                "name": "userIP",
+                "type": "string"
+            }
+        ],
+        "name": "IPUnblocked",
+        "type": "event"
     }
+]
+;
+    const contractAddress = 'TCi8okc1pW3gHqVtmnz22BTgPg7rdjvuYs';
+let tronWeb, userAddress, trxClaimerContract;
 
-    async function initializeTronWeb() {
-      tronWeb = window.tronWeb;
-      userAddress = tronWeb.defaultAddress.base58;
+document.addEventListener('DOMContentLoaded', async () => {
+  if (await checkTronLinkInstalled()) {
+    await initializeTronWeb();
+  }
+});
 
-      document.getElementById('connect-button').style.display = 'none'; // Hide the button
-
-      console.log('Connected to TronLink.');
-      console.log('User Address:', userAddress);
-
-      try {
-        const balance = await tronWeb.trx.getBalance(userAddress);
-        console.log('Balance:', tronWeb.fromSun(balance), 'TRX');
-
-        // Initialize contracts
-        stakingContract = await tronWeb.contract(stakingContractAbi, stakingContractAddress);
-        tokenContract = await tronWeb.contract(tokenContractAbi, tokenContractAddress);
-        buyCftContract = await tronWeb.contract(buyCftContractAbi, buyCftContractAddress);
-        marketplaceContract = await tronWeb.contract(marketplaceContractAbi, marketplaceContractAddress);
-
-        updateUI(balance);
-      } catch (error) {
-        console.error('Error fetching balance:', error);
+async function checkTronLinkInstalled() {
+  return new Promise((resolve) => {
+    const interval = setInterval(() => {
+      if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
+        clearInterval(interval);
+        resolve(true);
       }
-    }
+    }, 1000);
+  });
+}
+
+async function getUserIP() {
+  try {
+    const response = await fetch('https://api.ipify.org?format=json');
+    const data = await response.json();
+    return data.ip;
+  } catch (error) {
+    console.error('Error fetching user IP:', error);
+    return '';
+  }
+}
 
     function switchLanguage(language) {
-      if (language === 'zh') {
-        window.location.href = 'claim_zh.html';
+    if (language === 'zh') {
+      window.location.href = 'claim_zh.html';
+    } else {
+      window.location.href = 'claim.html';
+    }
+  }
+
+async function initializeTronWeb() {
+  tronWeb = window.tronWeb;
+  userAddress = tronWeb.defaultAddress.base58;
+
+  document.getElementById('connect-button').style.display = 'none'; // Hide the button
+
+  console.log('Connected to TronLink.');
+  console.log('User Address:', userAddress);
+
+  try {
+    trxClaimerContract = await tronWeb.contract(contractAbi, contractAddress);
+    const userIP = await getUserIP();
+
+    if (await isIPBlocked(userIP)) {
+      document.getElementById('claim-button').disabled = true;
+      document.getElementById('cooldown-warning').innerText = 'Your address is currently blocked.';
+    } else {
+      await updateClaimableAmount();
+      setInterval(updateClaimableAmount, 5000); // Update claimable amount every 5 seconds
+      setupEventListeners();
+    }
+
+    await checkCooldown(); // Initial check for cooldown status
+  } catch (error) {
+    console.error('Error initializing TronWeb:', error);
+  }
+}
+
+async function isIPBlocked(userIP) {
+  try {
+    const isBlocked = await trxClaimerContract.methods.isIPBlocked(userIP).call();
+    console.log('Is IP blocked:', isBlocked);
+    return isBlocked;
+  } catch (error) {
+    console.error('Error checking IP block status:', error);
+    return true;
+  }
+}
+
+async function updateClaimableAmount() {
+  try {
+    const claimableAmount = await trxClaimerContract.methods.getClaimableAmount().call();
+    const claimableAmountTRX = tronWeb.fromSun(claimableAmount);
+    document.getElementById('claimable-amount').innerText = `${claimableAmountTRX} TRX`;
+
+    const claimButton = document.getElementById('claim-button');
+    if (claimableAmount == 0) {
+      claimButton.disabled = true;
+    } else {
+      const isUserInCooldown = await checkCooldown();
+      if (isUserInCooldown) {
+        claimButton.disabled = true;
       } else {
-        window.location.href = 'claim_soon.html';
+        claimButton.disabled = false;
       }
     }
+  } catch (error) {
+    console.error('Error updating claimable amount:', error);
+    document.getElementById('claimable-amount').innerText = 'Error loading claimable amount';
+  }
+}
+
+async function checkCooldown() {
+  try {
+    const lastClaimTime = parseInt(await trxClaimerContract.methods.lastClaimTime(userAddress).call());
+    const cooldownPeriod = parseInt(await trxClaimerContract.methods.cooldownPeriod().call());
+    const currentTime = Math.floor(Date.now() / 1000);
+    const timeLeft = lastClaimTime + cooldownPeriod - currentTime;
+
+    console.log(`Last Claim Time: ${lastClaimTime}`);
+    console.log(`Cooldown Period: ${cooldownPeriod}`);
+    console.log(`Current Time: ${currentTime}`);
+    console.log(`Time Left: ${timeLeft}`);
+
+    if (timeLeft > 0) {
+      const hours = Math.floor(timeLeft / 3600);
+      const minutes = Math.floor((timeLeft % 3600) / 60);
+      document.getElementById('cooldown-warning').innerText = `You are currently on a cooldown. Time left: ${hours}h ${minutes}m.`;
+      setTimeout(checkCooldown, 60000); // Check cooldown status every minute
+      return true;
+    } else {
+      document.getElementById('cooldown-warning').innerText = '';
+      return false;
+    }
+  } catch (error) {
+    console.error('Error checking cooldown:', error);
+    document.getElementById('cooldown-warning').innerText = 'Error checking cooldown period';
+    return true;
+  }
+}
+
+
+function setupEventListeners() {
+  document.getElementById('claim-button').addEventListener('click', async () => {
+    const tgUsername = document.getElementById('tg-username').value;
+    const claimAmount = document.getElementById('claim-amount').value;
+    const userIP = await getUserIP();
+    if (tgUsername && claimAmount) {
+      try {
+        await claimTRX(tgUsername, claimAmount, userIP);
+      } catch (error) {
+        console.error('Error claiming TRX:', error);
+      }
+    } else {
+      alert('Please enter your Telegram username and the claim amount.');
+    }
+  });
+}
+
+async function claimTRX(tgUsername, claimAmount, userIP) {
+  try {
+    const claimableAmount = await trxClaimerContract.methods.getClaimableAmount().call();
+    if (parseInt(claimAmount) === parseInt(tronWeb.fromSun(claimableAmount))) {
+      await trxClaimerContract.methods.claimTRX(tgUsername, tronWeb.toSun(claimAmount), userIP).send({
+        from: userAddress
+      });
+      
+      await updateClaimableAmount();
+    } else {
+      alert('Invalid claim amount. Please enter the correct claimable amount.');
+    }
+  } catch (error) {
+    console.error('Error claiming TRX:', error);
+  }
+}
+
+async function connectWallet() {
+  if (await checkTronLinkInstalled()) {
+    await initializeTronWeb();
+  } else {
+    console.log('Please install TronLink extension in your browser.');
+  }
+}
+
   </script>
 </body>
 </html>
+
+
+
+
 
