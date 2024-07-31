@@ -1044,7 +1044,13 @@ async function calculateApr() {
     }
 }
 
-
+function switchLanguage(language) {
+    if (language === 'zh') {
+      window.location.href = 'usdt_zh.html';
+    } else {
+      window.location.href = 'usdt.html';
+    }
+  }
 
 
 
