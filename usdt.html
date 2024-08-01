@@ -1010,7 +1010,7 @@ async function calculateApr() {
     try {
         const dailyReward = await newStakingContract.methods.viewDailyReward().call();
         const totalStaked = await newStakingContract.methods.viewTotalStaked().call();
-        const trxPriceInUsdt = 1.3; // Fixed TRX price
+        const trxPriceInUsdt = 0.13; // Fixed TRX price
 
         // Log the values to debug
         console.log('Daily Reward:', dailyReward);
