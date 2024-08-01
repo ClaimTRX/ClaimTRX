@@ -1006,41 +1006,42 @@
 
 
 
-async function calculateApr() {
+async function 计算APR() {
     try {
         const dailyReward = await newStakingContract.methods.viewDailyReward().call();
         const totalStaked = await newStakingContract.methods.viewTotalStaked().call();
-        const trxPriceInUsdt = 0.13; // 固定的 TRX 价格
+        const tokenPriceInUsdt = 0.13; // 每个代币的USDT价格
 
-        // 记录调试的值
-        console.log('每日奖励:', dailyReward);
-        console.log('总质押:', totalStaked);
-        console.log('USDT 中的 TRX 价格:', trxPriceInUsdt);
+        // 调试日志
+        console.log('每日奖励（原始值）:', dailyReward);
+        console.log('总质押量:', totalStaked);
+        console.log('代币的USDT价格:', tokenPriceInUsdt);
 
-        // 确保值是有效数字
-        if (!dailyReward || !totalStaked || !trxPriceInUsdt) {
-            console.error('接收到无效数据，无法计算年利率');
-            document.getElementById('apr').innerText = '年利率: 无法计算';
+        // 确保值是有效的数字
+        if (!dailyReward || !totalStaked || !tokenPriceInUsdt) {
+            console.error('用于APR计算的数据无效');
+            document.getElementById('apr').innerText = 'APR: 无法计算';
             return;
         }
 
-        const dailyRewardInUsdt = tronWeb.fromSun(dailyReward) * trxPriceInUsdt;
-        const totalStakedInUsdt = tronWeb.fromSun(totalStaked) * trxPriceInUsdt;
+        // 将每日奖励转换为USDT，考虑6位小数
+        const dailyRewardInUsdt = dailyReward / 1e6;
+        const totalStakedInUsdt = tronWeb.fromSun(totalStaked) * tokenPriceInUsdt;
 
-        // 确保值是有效数字
+        // 确保值是有效的数字
         if (isNaN(dailyRewardInUsdt) || isNaN(totalStakedInUsdt) || totalStakedInUsdt == 0) {
-            console.error('用于计算年利率的数值无效');
-            document.getElementById('apr').innerText = '年利率: 无法计算';
+            console.error('用于APR计算的数值无效');
+            document.getElementById('apr').innerText = 'APR: 无法计算';
             return;
         }
 
         const yearlyRewardInUsdt = dailyRewardInUsdt * 365;
         const apr = (yearlyRewardInUsdt / totalStakedInUsdt) * 100;
 
-        document.getElementById('apr').innerText = `年利率: ${apr.toFixed(2)} %`;
+        document.getElementById('apr').innerText = `APR: ${apr.toFixed(2)} %`;
     } catch (error) {
-        console.error('计算年利率时出错:', error);
-        document.getElementById('apr').innerText = '年利率: 无法计算';
+        console.error('计算APR时出错:', error);
+        document.getElementById('apr').innerText = 'APR: 无法计算';
     }
 }
 
