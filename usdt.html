@@ -1010,22 +1010,23 @@ async function calculateApr() {
     try {
         const dailyReward = await newStakingContract.methods.viewDailyReward().call();
         const totalStaked = await newStakingContract.methods.viewTotalStaked().call();
-        const trxPriceInUsdt = 0.13; // Fixed TRX price
+        const tokenPriceInUsdt = 0.13; // Price of each token in USDT
 
         // Log the values to debug
-        console.log('Daily Reward:', dailyReward);
+        console.log('Daily Reward (raw):', dailyReward);
         console.log('Total Staked:', totalStaked);
-        console.log('TRX Price in USDT:', trxPriceInUsdt);
+        console.log('Token Price in USDT:', tokenPriceInUsdt);
 
         // Ensure the values are valid numbers
-        if (!dailyReward || !totalStaked || !trxPriceInUsdt) {
+        if (!dailyReward || !totalStaked || !tokenPriceInUsdt) {
             console.error('Invalid data received for APR calculation');
             document.getElementById('apr').innerText = 'APR: Unable to calculate';
             return;
         }
 
-        const dailyRewardInUsdt = tronWeb.fromSun(dailyReward) * trxPriceInUsdt;
-        const totalStakedInUsdt = tronWeb.fromSun(totalStaked) * trxPriceInUsdt;
+        // Convert daily reward to USDT considering 6 decimals
+        const dailyRewardInUsdt = dailyReward / 1e6;
+        const totalStakedInUsdt = tronWeb.fromSun(totalStaked) * tokenPriceInUsdt;
 
         // Ensure the values are valid numbers
         if (isNaN(dailyRewardInUsdt) || isNaN(totalStakedInUsdt) || totalStakedInUsdt == 0) {
@@ -1043,6 +1044,7 @@ async function calculateApr() {
         document.getElementById('apr').innerText = 'APR: Unable to calculate';
     }
 }
+
 
 function switchLanguage(language) {
     if (language === 'zh') {
