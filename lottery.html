@@ -219,9 +219,11 @@
     <script src="https://cdn.jsdelivr.net/npm/@tronweb3/tronweb/dist/TronWeb.min.js"></script>
     <script>
         let tronWeb;
-        let contract;
+        let contract1;
+        let contract2;
 
-        const contractAddress = "TMUDuMwYd94M6k7bhKgo6kqBKiDkjAFPDV";
+        const contractAddress1 = "TMUDuMwYd94M6k7bhKgo6kqBKiDkjAFPDV";
+        const contractAddress2 = "TWR9VQrzTi9iQGCG7R25cnqifAXFy9SWLs";
         const contractABI = [
             {
                 "inputs": [
@@ -384,7 +386,7 @@
             }
         ];
 
-      async function checkTronLinkInstalled() {
+        async function checkTronLinkInstalled() {
             return new Promise((resolve) => {
                 const interval = setInterval(() => {
                     if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
@@ -400,7 +402,8 @@
             const account = tronWeb.defaultAddress.base58;
             document.getElementById('connectWallet').innerText = 'Connected';
             document.getElementById('connectWallet').style.display = 'none';
-            contract = await tronWeb.contract(contractABI, contractAddress);
+            contract1 = await tronWeb.contract(contractABI, contractAddress1);
+            contract2 = await tronWeb.contract(contractABI, contractAddress2);
             updateUI();
             updateTicketCount(account);
         }
@@ -419,27 +422,51 @@
 
         async function updateUI() {
             try {
-                const ticketsSold = await contract.methods.ticketsSold().call();
-                const prizeAmount = await contract.methods.prizeAmount().call();
-                const ticketsSoldElement = document.getElementById('ticketsSold');
-                const prizeAmountElement = document.getElementById('prizeAmount');
-                const drawButton = document.getElementById('drawButton');
+                const ticketsSold1 = await contract1.methods.ticketsSold().call();
+                const prizeAmount1 = await contract1.methods.prizeAmount().call();
+                const ticketsSoldElement1 = document.getElementById('ticketsSold');
+                const prizeAmountElement1 = document.getElementById('prizeAmount');
+                const drawButton1 = document.getElementById('drawButton');
 
-                if (ticketsSoldElement) {
-                    ticketsSoldElement.innerText = `Tickets sold: ${ticketsSold}`;
+                if (ticketsSoldElement1) {
+                    ticketsSoldElement1.innerText = `Tickets sold: ${ticketsSold1}`;
                 }
 
-                if (prizeAmountElement) {
-                    prizeAmountElement.innerText = `Current prize: ${tronWeb.fromSun(prizeAmount)} TRX`;
+                if (prizeAmountElement1) {
+                    prizeAmountElement1.innerText = `Current prize: ${tronWeb.fromSun(prizeAmount1)} TRX`;
                 }
 
-                if (drawButton) {
-                    if (ticketsSold >= 25) {
-                        drawButton.disabled = false;
-                        drawButton.classList.remove('disabled');
+                if (drawButton1) {
+                    if (ticketsSold1 >= 25) {
+                        drawButton1.disabled = false;
+                        drawButton1.classList.remove('disabled');
                     } else {
-                        drawButton.disabled = true;
-                        drawButton.classList.add('disabled');
+                        drawButton1.disabled = true;
+                        drawButton1.classList.add('disabled');
+                    }
+                }
+
+                const ticketsSold2 = await contract2.methods.ticketsSold().call();
+                const prizeAmount2 = await contract2.methods.prizeAmount().call();
+                const ticketsSoldElement2 = document.getElementById('ticketsSold2');
+                const prizeAmountElement2 = document.getElementById('prizeAmount2');
+                const drawButton2 = document.getElementById('drawButton2');
+
+                if (ticketsSoldElement2) {
+                    ticketsSoldElement2.innerText = `Tickets sold: ${ticketsSold2}`;
+                }
+
+                if (prizeAmountElement2) {
+                    prizeAmountElement2.innerText = `Current prize: ${tronWeb.fromSun(prizeAmount2)} TRX`;
+                }
+
+                if (drawButton2) {
+                    if (ticketsSold2 >= 25) {
+                        drawButton2.disabled = false;
+                        drawButton2.classList.remove('disabled');
+                    } else {
+                        drawButton2.disabled = true;
+                        drawButton2.classList.add('disabled');
                     }
                 }
             } catch (error) {
@@ -447,34 +474,39 @@
             }
         }
 
-         function switchLanguage(language) {
-    if (language === 'zh') {
-      window.location.href = 'lottery_zh.html';
-    } else {
-      window.location.href = 'lottery.html';
-    }
-  }
-
+        function switchLanguage(language) {
+            if (language === 'zh') {
+                window.location.href = 'lottery_zh.html';
+            } else {
+                window.location.href = 'lottery.html';
+            }
+        }
 
         async function updateTicketCount(account) {
             try {
-                const ticketsCount = await contract.methods.getTickets(account).call();
-                const ticketsCountElement = document.getElementById('ticketsCount');
-                if (ticketsCountElement) {
-                    ticketsCountElement.innerText = `Your tickets: ${ticketsCount}`;
+                const ticketsCount1 = await contract1.methods.getTickets(account).call();
+                const ticketsCountElement1 = document.getElementById('ticketsCount');
+                if (ticketsCountElement1) {
+                    ticketsCountElement1.innerText = `Your tickets: ${ticketsCount1}`;
+                }
+
+                const ticketsCount2 = await contract2.methods.getTickets(account).call();
+                const ticketsCountElement2 = document.getElementById('ticketsCount2');
+                if (ticketsCountElement2) {
+                    ticketsCountElement2.innerText = `Your tickets: ${ticketsCount2}`;
                 }
             } catch (error) {
                 console.error('Error getting ticket count:', error);
             }
         }
 
-        async function buyTickets() {
+        async function buyTickets1() {
             try {
                 const amount = document.getElementById('ticketAmount').value;
-                const ticketPrice = await contract.methods.ticketPrice().call();
+                const ticketPrice = await contract1.methods.ticketPrice().call();
                 const totalCost = ticketPrice * amount;
 
-                await contract.methods.buyTickets(amount).send({
+                await contract1.methods.buyTickets(amount).send({
                     from: tronWeb.defaultAddress.base58,
                     callValue: totalCost
                 });
@@ -486,9 +518,39 @@
             }
         }
 
-        async function drawWinner() {
+        async function buyTickets2() {
             try {
-                await contract.methods.drawWinner().send({
+                const amount = document.getElementById('ticketAmount2').value;
+                const ticketPrice = await contract2.methods.ticketPrice().call();
+                const totalCost = ticketPrice * amount;
+
+                await contract2.methods.buyTickets(amount).send({
+                    from: tronWeb.defaultAddress.base58,
+                    callValue: totalCost
+                });
+
+                updateUI();
+                updateTicketCount(tronWeb.defaultAddress.base58);
+            } catch (error) {
+                console.error('Error buying tickets:', error);
+            }
+        }
+
+        async function drawWinner1() {
+            try {
+                await contract1.methods.drawWinner().send({
+                    from: tronWeb.defaultAddress.base58
+                });
+
+                updateUI();
+            } catch (error) {
+                console.error('Error drawing winner:', error);
+            }
+        }
+
+        async function drawWinner2() {
+            try {
+                await contract2.methods.drawWinner().send({
                     from: tronWeb.defaultAddress.base58
                 });
 
@@ -506,21 +568,26 @@
             document.getElementById('connectWallet').addEventListener('click', connectWallet);
             document.getElementById('buyTicketsForm').addEventListener('submit', (event) => {
                 event.preventDefault();
-                buyTickets();
+                buyTickets1();
             });
-            document.getElementById('drawButton').addEventListener('click', drawWinner);
+            document.getElementById('buyTicketsForm2').addEventListener('submit', (event) => {
+                event.preventDefault();
+                buyTickets2();
+            });
+            document.getElementById('drawButton').addEventListener('click', drawWinner1);
+            document.getElementById('drawButton2').addEventListener('click', drawWinner2);
         });
     </script>
 </head>
 <body>
     <div class="sidebar">
         <h2>CFT</h2>
-         <a href="index.html">CFT Token</a>
-    <a href="usdt.html">USDT Rewards</a>
-    <a href="lottery.html">Lottery</a>
-    <a href="draw.html">Draw</a>
-    <a href="claim.html">Claim</a>
-    <a href="treasury.html">Treasury</a>
+        <a href="index.html">CFT Token</a>
+        <a href="usdt.html">USDT Rewards</a>
+        <a href="lottery.html">Lottery</a>
+        <a href="draw.html">Draw</a>
+        <a href="claim.html">Claim</a>
+        <a href="treasury.html">Treasury</a>
         <div class="social-links">
             <a href="https://x.com/cfttrc20?s=21" target="_blank" class="social-icon">
                 <i class="fab fa-twitter"></i>
@@ -555,9 +622,8 @@
                     <div id="visitText"><a href="https://explorer.just.money/address/TMUDuMwYd94M6k7bhKgo6kqBKiDkjAFPDV" target="_blank" rel="noopener noreferrer">Contract</a></div>
                 </div>
                 <div class="card-explanation">
-                    <div><p>Register every 24 hours to participate in the Lottery. 1000 CFT to be won weekly.</p></div>
+                    <div><p>Buy tickets to participate in the Lottery. Minimum 187 TRX to be won each Draw</p></div>
                     <div><p>Contract owner pays energy fees. Only bandwidth cost will be taken from user.</p></div>
-                    <div><p>To participate you need 10 TRX tokens unstaked in your wallet.</p></div>
                     <div><p>Tickets cost 10 TRX each. 75% of the ticket sales go to the winner, and 25% is used to buy and burn CFT.</p></div>
                     <div><p>The draw button is enabled when a minimum of 25 tickets are sold.</p></div>
                 </div>
@@ -566,43 +632,28 @@
         <div class="card mt-4">
             <div class="card-body">
                 <div class="card-text-section">
-                    <h5 class="card-title">50 TRX Lottery (Coming Soon)</h5>
+                    <h5 class="card-title">10 TRX Lottery</h5>
                     <div id="lotteryStatusMessage2" class="card-text hidden" style="color: green;"></div>
-                    <button class="btn btn-success disabled" disabled>Buy Tickets</button>
-                    <button class="btn btn-primary disabled" disabled>Draw Winner</button>
-                    <div id="prizeAmount2">Current prize: Coming Soon</div>
-                    <div id="ticketsSold2">Tickets sold: Coming Soon</div>
-                    <div id="ticketsCount2">Your tickets: Coming Soon</div>
+                    <form id="buyTicketsForm2">
+                        <input type="number" id="ticketAmount2" min="1" required placeholder="Amount of tickets"><br>
+                        <button type="submit" class="btn btn-success">Buy Tickets</button>
+                    </form>
+                    <button id="drawButton2" class="btn btn-primary disabled" disabled>Draw Winner</button>
+                    <div id="prizeAmount2">Current prize: 0 TRX</div>
+                    <div id="ticketsSold2">Tickets sold: 0</div>
+                    <div id="ticketsCount2">Your tickets: 0</div>
+                    <div id="visitText2"><a href="https://explorer.just.money/address/TWR9VQrzTi9iQGCG7R25cnqifAXFy9SWLs" target="_blank" rel="noopener noreferrer">Contract</a></div>
                 </div>
                 <div class="card-explanation">
-                    <div><p>Register every 24 hours to participate in the Lottery. 1000 CFT to be won weekly.</p></div>
+                    <div><p>Buy tickets to participate in the Lottery. Minimum 400 TRX to be won each Draw </p></div>
                     <div><p>Contract owner pays energy fees. Only bandwidth cost will be taken from user.</p></div>
-                    <div><p>To participate you need 50 TRX tokens unstaked in your wallet.</p></div>
-                    <div><p>Tickets cost 50 TRX each. 75% of the ticket sales go to the winner, and 25% is used to buy and burn CFT.</p></div>
-                    <div><p>The draw button is enabled when a minimum of 25 tickets are sold.</p></div>
+                    <div><p>Tickets cost 10 TRX each. 80% of the ticket sales go to the winner, 10% is used to buy and burn JM.</p></div>
+                    <div><p>10% is used to buy and burn CFT. The draw button is enabled when a minimum of 50 tickets are sold.</p></div>
                 </div>
             </div>
         </div>
-        <div class="card mt-4">
-            <div class="card-body">
-                <div class="card-text-section">
-                    <h5 class="card-title">100 TRX Lottery (Coming Soon)</h5>
-                    <div id="lotteryStatusMessage3" class="card-text hidden" style="color: green;"></div>
-                    <button class="btn btn-success disabled" disabled>Buy Tickets</button>
-                    <button class="btn btn-primary disabled" disabled>Draw Winner</button>
-                    <div id="prizeAmount3">Current prize: Coming Soon</div>
-                    <div id="ticketsSold3">Tickets sold: Coming Soon</div>
-                    <div id="ticketsCount3">Your tickets: Coming Soon</div>
-                </div>
-                <div class="card-explanation">
-                    <div><p>Register every 24 hours to participate in the Lottery. 1000 CFT to be won weekly.</p></div>
-                    <div><p>Contract owner pays energy fees. Only bandwidth cost will be taken from user.</p></div>
-                    <div><p>To participate you need 100 TRX tokens unstaked in your wallet.</p></div>
-                    <div><p>Tickets cost 100 TRX each. 75% of the ticket sales go to the winner, and 25% is used to buy and burn CFT.</p></div>
-                    <div><p>The draw button is enabled when a minimum of 25 tickets are sold.</p></div>
-                </div>
-            </div>
-        </div>
+        
     </div>
 </body>
 </html>
+
