@@ -831,7 +831,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function fetchStakingData() {
       try {
-        const stakedTRX = 264399; // Replace with actual contract call
+        const stakedTRX = 284398; // Replace with actual contract call
         document.getElementById('voting-power').innerText = `${formatNumber(stakedTRX)} TRX`;
 
         const totalStakedCFT = await stakingContract.methods.viewTotalStaked().call();
