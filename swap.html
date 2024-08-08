@@ -314,27 +314,7 @@
     <div class="card">
       <div class="card-body">
         <div class="widget-container">
-          <div id="jmSwapFrame"></div>
-        </div>
-        <div class="card-text-section">
-          <p class="card-title">JustMoney Swap</p>
-          <p>Use the JM Swap widget to swap your favorite tokens. </p>
-          <div id="visitText"><a href="https://explorer.just.money/" target="_blank" rel="noopener noreferrer">Visit the new JustMoney Explorer</a></div></p>
-        </div>
-      </div>
-    </div>
-  </div>
-   
-  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/tronweb/dist/TronWeb.min.js"></script>
-  <script src="https://just.money/assets/js/widgetLib-1.1.js"></script>
-  <script>
-    let tronWeb, userAddress, stakingContract, newStakingContract;
-
-    document.addEventListener('DOMContentLoaded', async () => {
-      // Create the swap widget
-      window.JmApi.createSwapWidget('jmSwapFrame', {
+          window.JmApi.createSwapWidget('jmSwapFrame', {
         type: "SINGLECHAIN",
         network: "TRON",
         tokens: [
@@ -356,6 +336,26 @@
         inputContainerInputStyle: "color: #ffffff;",
         inputContainerInputPlaceholderStyle: "color: #ffffff;opacity: 0.5;"
       });
+        </div>
+        <div class="card-text-section">
+          <p class="card-title">JustMoney Swap</p>
+          <p>Use the JM Swap widget to swap your favorite tokens. </p>
+          <div id="visitText"><a href="https://explorer.just.money/" target="_blank" rel="noopener noreferrer">Visit the new JustMoney Explorer</a></div></p>
+        </div>
+      </div>
+    </div>
+  </div>
+   
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tronweb/dist/TronWeb.min.js"></script>
+  <script src="https://just.money/assets/js/widgetLib-1.1.js"></script>
+  <script>
+    let tronWeb, userAddress, stakingContract, newStakingContract;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Create the swap widget
+      
 
       if (await checkTronLinkInstalled()) {
         await initializeTronWeb();
