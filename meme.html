@@ -256,7 +256,7 @@
       <h5 class="card-title mt-3">Total Staked $SUNRAT</h5>
       <p class="card-text" id="total-staked-token1">Loading...</p>
       
-      <h5 class="card-title mt-3">Your Staked $SunRat</h5>
+      <h5 class="card-title mt-3">Your Staked $SUNRAT</h5>
       <p class="card-text" id="staked-amount-token1">Loading...</p>
       
       <h5 class="card-title mt-3">Your Staked Percentage</h5>
@@ -1150,7 +1150,7 @@
                 const totalStaked = totalStakedRaw / Math.pow(10, decimals);
 
                 // Display the total staked amount with correct formatting
-                document.getElementById(`total-staked-${token}`).innerText = formatNumber(totalStaked) + ' TRX';
+                document.getElementById(`total-staked-${token}`).innerText = formatNumber(totalStaked) + ' $SUNRAT';
             } catch (error) {
                 console.error(`Error fetching total staked TRX for ${token}:`, error);
             }
@@ -1199,7 +1199,7 @@
                 const stakedAmount = stakedAmountRaw / Math.pow(10, decimals);
 
                 // Display the staked amount with correct formatting
-                document.getElementById(`staked-amount-${token}`).innerText = formatWholeNumber(stakedAmount) + ' CFT';
+                document.getElementById(`staked-amount-${token}`).innerText = formatWholeNumber(stakedAmount) + ' $SUNRAT';
             } catch (error) {
                 console.error(`Error fetching staked amount for ${token}:`, error);
             }
