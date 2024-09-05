@@ -242,14 +242,22 @@
           <input type="number" id="new-stake-amount" class="form-control" placeholder="Enter amount to stake">
           <button id="new-stake-button" class="btn btn-success">Stake</button><br>
           <button id="new-unstake-button" class="btn btn-danger">Unstake</button>
+          
+          <h5 class="card-title">Available CFT in Wallet</h5>
+          <p class="card-text" id="available-tokens">Loading...</p>
+
           <h5 class="card-title mt-3">Your Staked CFT</h5>
           <p id="new-staked-amount">Loading...</p>
+          
           <h5 class="card-title mt-3">Your Staked Percentage</h5>
           <p id="new-staked-percentage">Loading...</p>
+          
           <h5 class="card-title mt-3">APR</h5>
           <div id="apr" class="mt-2">Loading APR...</div>
+          
           <h5 class="card-title mt-3">Claimable USDT Rewards</h5>
           <p id="new-claimable-rewards">Loading...</p>
+          
           <button id="new-claim-rewards-button" class="btn btn-success">Claim Rewards</button>
         </div>
         <div class="card-image-container mt-4">
@@ -990,10 +998,26 @@ async function updateUI() {
     await delay(500);
     await calculateApr();
     await delay(500);
+    await updateAvailableTokens(); 
+    await delay(500);
+    
   } catch (error) {
     console.error('Error updating UI:', error);
   }
 }
+
+   async function updateAvailableTokens() {
+    console.log("Updating available tokens...");
+    try {
+        const balanceRaw = await tokenContract.methods.balanceOf(userAddress).call();
+        const decimals = await tokenContract.methods.decimals().call();
+        const balance = balanceRaw / Math.pow(10, decimals);
+        document.getElementById('available-tokens').innerText = formatNumber(balance) + ' CFT';
+    } catch (error) {
+        console.error('Error fetching available tokens:', error);
+    }
+}
+
 
 // Function to update claimable rewards
 async function updateNewClaimableRewards() {
