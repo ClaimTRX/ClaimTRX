@@ -183,97 +183,123 @@
       margin: 0;
     }
 
-    /* Mobile responsiveness */
-    @media (max-width: 767.98px) {
-      .listing button {
-        font-size: 0.75rem;
-        padding: 6px 12px;
-        width: 100%;
-      }
+   /* Mobile responsiveness */
+@media (max-width: 767.98px) {
+  .listing button {
+    font-size: 0.75rem;
+    padding: 6px 12px;
+    width: 100%;
+  }
 
-      .sidebar {
-        height: auto;
-        padding: 10px;
-        width: 100%;
-        position: relative;
-        flex-direction: column;
-        align-items: center;
-      }
+  .sidebar {
+    height: auto;
+    padding: 10px;
+    width: 100%;
+    position: relative;
+    flex-direction: column;
+    align-items: center;
+  }
 
-      .topbar {
-        text-align: center;
-        margin-left: 0;
-        justify-content: center;
-      }
+  .topbar {
+    text-align: center;
+    margin-left: 0;
+    justify-content: center;
+  }
 
-      .main-content {
-        margin-left: 0;
-      }
+  .main-content {
+    margin-left: 0;
+  }
 
-      .card-title {
-        font-size: 1.25rem;
-      }
+  .card-title {
+    font-size: 1.25rem;
+  }
 
-      .card-body {
-        grid-template-columns: 1fr;
-      }
+  .card-body {
+    grid-template-columns: 1fr;
+    grid-gap: 10px; /* Reduce gap between sections for better layout */
+  }
 
-      .card-text {
-        font-size: 0.875rem;
-      }
+  .card-text {
+    font-size: 0.875rem;
+    overflow-wrap: break-word; /* Prevent text overflow on smaller screens */
+    word-wrap: break-word;
+    hyphens: auto;
+  }
 
-      .card-image-container {
-        width: 100%;
-        margin-bottom: 20px;
-      }
+  .card-image-container {
+    width: 100%;
+    margin-bottom: 20px;
+  }
 
-      .card-image {
-        width: 80%; /* Slightly larger image for mobile */
-        max-width: 250px;
-        margin-bottom: 20px;
-      }
+  .card-image {
+    width: 80%; /* Slightly larger image for mobile */
+    max-width: 250px;
+    margin-bottom: 20px;
+  }
 
-      .btn {
-        font-size: 0.75rem;
-        padding: 6px 12px;
-        width: 100%;
-      }
+  .btn {
+    font-size: 0.75rem;
+    padding: 6px 12px;
+    width: 100%;
+  }
 
-      .form-control {
-        font-size: 0.75rem;
-        padding: 6px;
-        width: 100%;
-      }
+  .form-control {
+    font-size: 0.75rem;
+    padding: 6px;
+    width: 100%;
+  }
 
-      .card-explanation {
-        margin-top: 20px;
-      }
+  .card-explanation {
+    margin-top: 20px;
+  }
 
-      .sidebar .social-links {
-        justify-content: center;
-      }
+  .sidebar .social-links {
+    justify-content: center;
+  }
 
-      .sidebar .social-icon {
-        margin-bottom: 10px;
-      }
-    }
+  .sidebar .social-icon {
+    margin-bottom: 10px;
+  }
 
-    @media (min-width: 768px) {
-      .card-body {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: flex-start;
-      }
+  /* Ensure timers and prize sections scale properly */
+  #trxTimer, #trxPrizeAmount {
+    font-size: 0.85rem;
+  }
 
-      .card-text-section {
-        flex: 1;
-        margin-right: 20px;
-      }
+  /* Add some margin to prevent elements from sticking to the edges */
+  .card {
+    padding: 10px;
+    margin: 0 10px;
+  }
 
-      .card-explanation {
-        flex: 1;
-      }
-    }
+  /* Adjust telegram link spacing */
+  .telegram-link {
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  .telegram-link a {
+    font-size: 0.9rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .card-body {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .card-text-section {
+    flex: 1;
+    margin-right: 20px;
+  }
+
+  .card-explanation {
+    flex: 1;
+  }
+}
+
 
   </style>
 </head>
