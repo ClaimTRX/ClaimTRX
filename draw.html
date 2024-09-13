@@ -184,6 +184,7 @@
     }
 
    /* Mobile responsiveness */
+/* Mobile responsiveness */
 @media (max-width: 767.98px) {
   .listing button {
     font-size: 0.75rem;
@@ -208,31 +209,44 @@
 
   .main-content {
     margin-left: 0;
+    padding: 10px; /* Add padding for better spacing */
+  }
+
+  .card {
+    width: 100%; /* Ensure the card takes full width */
+    max-width: 100%; /* No restriction on the max-width */
+    padding: 15px; /* Reduce padding for mobile */
+    margin: 10px auto; /* Add auto margins for centered alignment */
+    word-wrap: break-word; /* Ensure content wraps */
+    overflow-wrap: break-word; /* Same as above, but additional safeguard */
   }
 
   .card-title {
     font-size: 1.25rem;
+    text-align: center; /* Center-align title on mobile */
   }
 
   .card-body {
     grid-template-columns: 1fr;
-    grid-gap: 10px; /* Reduce gap between sections for better layout */
+    grid-gap: 10px; /* Reduce the gap for mobile */
   }
 
   .card-text {
     font-size: 0.875rem;
-    overflow-wrap: break-word; /* Prevent text overflow on smaller screens */
+    overflow-wrap: break-word; /* Prevent text overflow */
     word-wrap: break-word;
     hyphens: auto;
+    text-align: center; /* Center-align the text */
   }
 
   .card-image-container {
     width: 100%;
     margin-bottom: 20px;
+    text-align: center; /* Center-align the image */
   }
 
   .card-image {
-    width: 80%; /* Slightly larger image for mobile */
+    width: 80%; /* Ensure the image scales well on smaller screens */
     max-width: 250px;
     margin-bottom: 20px;
   }
@@ -251,6 +265,7 @@
 
   .card-explanation {
     margin-top: 20px;
+    text-align: center;
   }
 
   .sidebar .social-links {
@@ -264,6 +279,7 @@
   /* Ensure timers and prize sections scale properly */
   #trxTimer, #trxPrizeAmount {
     font-size: 0.85rem;
+    text-align: center;
   }
 
   /* Add some margin to prevent elements from sticking to the edges */
@@ -280,6 +296,11 @@
 
   .telegram-link a {
     font-size: 0.9rem;
+  }
+
+  #trxWarningMessage {
+    font-size: 0.875rem; /* Reduce font size for warning message */
+    text-align: center; /* Center the text for better readability */
   }
 }
 
@@ -299,6 +320,7 @@
     flex: 1;
   }
 }
+
 
 
   </style>
