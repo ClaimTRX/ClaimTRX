@@ -563,7 +563,7 @@
   try {
     const claimableAmount = await trxClaimerContract.methods.getClaimableAmount().call();
     const claimableAmountInToken = claimableAmount / 1e18;  // Convert from smallest unit (18 decimals)
-    const claimableAmountTRX = Math.floor(claimableAmountInToken);  // Round down to the nearest whole number (no decimals)
+    const claimableAmountTRX = Math.round(claimableAmountInToken);  // Round to the nearest whole number
 
     // Format the number with commas for better readability
     const formattedAmount = claimableAmountTRX.toLocaleString();
@@ -586,7 +586,6 @@
     document.getElementById('claimable-amount').innerText = 'Error loading claimable amount';
   }
 }
-
 
     async function checkCooldown() {
         try {
