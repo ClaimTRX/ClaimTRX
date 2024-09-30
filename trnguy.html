@@ -562,8 +562,8 @@
     async function updateClaimableAmount() {
   try {
     const claimableAmount = await trxClaimerContract.methods.getClaimableAmount().call();
-    const claimableAmountInToken = claimableAmount / 1e18;  // Divide by 10^18 to get the proper token amount
-    const claimableAmountTRX = Math.floor(claimableAmountInToken);  // Round down to the nearest whole number
+    const claimableAmountInToken = claimableAmount / 1e18;  // Convert from smallest unit (18 decimals)
+    const claimableAmountTRX = Math.floor(claimableAmountInToken);  // Round down to the nearest whole number (no decimals)
 
     // Format the number with commas for better readability
     const formattedAmount = claimableAmountTRX.toLocaleString();
