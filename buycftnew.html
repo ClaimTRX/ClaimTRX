@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CFT Token</title>
+  <link rel="icon" href="https://raw.githubusercontent.com/ClaimTRX/Test/main/favicon-32x32.png" type="image/png">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <style>
+    body {
+      background-color: #1a1a2e;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+
+    .sidebar {
+      height: 100vh;
+      background-color: #162447;
+      padding: 15px;
+      position: fixed;
+      width: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .sidebar a {
+      color: #fff;
+      text-decoration: none;
+      display: block;
+      padding: 10px 0;
+      width: 100%;
+      text-align: center;
+    }
+
+    .sidebar a:hover {
+      background-color: #1f4068;
+    }
+
+    .sidebar .social-links {
+      display: flex;
+      margin-top: 20px;
+    }
+
+    .sidebar .social-icon {
+      color: white;
+      font-size: 20px;
+      margin-right: 10px;
+      text-decoration: none;
+    }
+
+    .sidebar .social-icon:last-child {
+      margin-right: 0;
+    }
+
+    .topbar {
+      background-color: #162447;
+      padding: 10px;
+      text-align: right;
+      margin-left: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .topbar a.social-icon {
+      color: white;
+      margin-left: 15px;
+      font-size: 20px;
+      text-decoration: none;
+    }
+
+    .topbar button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 8px 16px;
+    }
+
+    .main-content {
+      margin-left: 220px;
+      padding: 20px;
+    }
+
+    .card {
+      background-color: #2c3e50;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 1200px;
+      margin: 20px auto;
+    }
+
+    .card-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-gap: 20px;
+      width: 100%;
+    }
+
+    .card-title {
+      font-size: 1.5rem;
+    }
+
+    .card-image-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .card-image {
+      width: 100%;
+      max-width: 400px;
+      height: auto;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+
+    .card-text {
+      font-size: 1rem;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    .btn-success {
+      background-color: #4CAF50;
+    }
+
+    .main-content h1 {
+      text-align: center;
+      width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h2>CFT</h2>
+    <a href="index.html">Welcome</a>
+    <a href="buy.html">Buy Tokens</a>
+    <a href="staking.html">CFT Staking</a>
+    <a href="games.html">Games</a>
+    <a href="swap.html">Swap</a>
+    <a href="meme.html">Meme Staking</a>
+    <a href="energy.html">Energy</a>
+    <div class="social-links">
+      <a href="https://x.com/cfttrc20?s=21" target="_blank" class="social-icon">
+        <i class="fab fa-twitter"></i>
+      </a>
+      <a href="https://t.me/claimfreetrxnow" target="_blank" class="social-icon">
+        <i class="fab fa-telegram-plane"></i>
+      </a>
+    </div>
+  </div>
+
+  <div class="topbar">
+    <button id="connect-button">Connect Wallet</button>
+    <span id="user-trx-balance" style="margin-left: 10px;">TRX Balance: 0 TRX</span>
+  </div>
+
+  <div class="main-content">
+    <h1>Buy CFT Tokens</h1>
+
+    <!-- Regular Buy Tokens Card -->
+    <div class="card mt-4">
+      <div class="card-body">
+        <div class="card-text-section">
+          <h5 class="card-title">Buy CFT Tokens</h5>
+          <p class="card-text">Current Buy Price: <span id="buy-price">Loading...</span> TRX per CFT</p>
+          <p class="card-text" id="available-cft">Loading CFT available...</p>
+          <input type="number" id="trx-amount" class="form-control" placeholder="Enter TRX amount">
+          <p class="card-text" id="calculated-cft">CFT tokens you will get: 0 CFT</p>
+          <button id="buy-button" class="btn btn-success">Buy CFT</button>
+        </div>
+        <div class="card-image-container mt-4">
+           <img src="https://raw.githubusercontent.com/ClaimTRX/ClaimTRX/main/66d80aecb2a23_download.jpg" class="card-image" alt="Token Image">
+        </div>
+      </div>
+    </div>
+
+    <!-- FEB Holder Buy Tokens Card -->
+    <div class="card mt-4">
+      <div class="card-body">
+        <div class="card-text-section">
+          <h5 class="card-title">Buy CFT Tokens (FEB Holders)</h5>
+          <p class="card-text">Special Buy Price: <span id="buy-price-feb">Loading...</span> TRX per CFT</p>
+          <input type="number" id="feb-trx-amount" class="form-control" placeholder="Enter TRX amount">
+          <p class="card-text" id="calculated-feb-cft">CFT tokens you will get: 0 CFT</p>
+          <button id="buy-feb-button" class="btn btn-success">Buy CFT (FEB)</button>
+        </div>
+        <div class="card-image-container mt-4">
+           <img src="https://raw.githubusercontent.com/ClaimTRX/ClaimTRX/main/66d80aecb2a23_download.jpg" class="card-image" alt="Token Image">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tronweb/dist/TronWeb.min.js"></script>
+  <script>
+    let tronWeb, userAddress, tokenContract, swapContract;
+    const tokenContractAddress = 'TAQzALyftaynnr3VG3rCvzkY2KouFH79sA'; // Replace with your token contract address
+    const swapContractAddress = 'TSaGTyDQwFK2LPY99H6GcucqjQrQUGXnLF'; // Replace with your swap contract address
+
+    const tokenContractAbi = [
+    {
+        "inputs": [],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "inputs": [],
+        "name": "name",
+        "outputs": [
+            {
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "symbol",
+        "outputs": [
+            {
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "decimals",
+        "outputs": [
+            {
+                "internalType": "uint8",
+                "name": "",
+                "type": "uint8"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "totalSupply",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "owner",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "taxAddress",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "taxRate",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "name": "whitelist",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "name": "balanceOf",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "name": "allowance",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_to",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_value",
+                "type": "uint256"
+            }
+        ],
+        "name": "transfer",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "success",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_spender",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_value",
+                "type": "uint256"
+            }
+        ],
+        "name": "approve",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "success",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_from",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_to",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_value",
+                "type": "uint256"
+            }
+        ],
+        "name": "transferFrom",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "success",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_taxRate",
+                "type": "uint256"
+            }
+        ],
+        "name": "setTaxRate",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_taxAddress",
+                "type": "address"
+            }
+        ],
+        "name": "setTaxAddress",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_account",
+                "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "_isWhitelisted",
+                "type": "bool"
+            }
+        ],
+        "name": "updateWhitelist",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "from",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "value",
+                "type": "uint256"
+            }
+        ],
+        "name": "Transfer",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "spender",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "value",
+                "type": "uint256"
+            }
+        ],
+        "name": "Approval",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "oldRate",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "newRate",
+                "type": "uint256"
+            }
+        ],
+        "name": "TaxRateChanged",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "oldAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "newAddress",
+                "type": "address"
+            }
+        ],
+        "name": "TaxAddressChanged",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "account",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "bool",
+                "name": "isWhitelisted",
+                "type": "bool"
+            }
+        ],
+        "name": "WhitelistUpdated",
+        "type": "event"
+    }
+];
+    
+    const buyCftContractAbi = [
+    {
+        "inputs": [
+            {
+                "internalType": "contract ITRC20",
+                "name": "_token",
+                "type": "address"
+            },
+            {
+                "internalType": "contract ITRC20",
+                "name": "_febToken",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_initialBuyPrice",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_initialBuyPriceFEB",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "inputs": [],
+        "name": "buyPrice",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "buyPriceFEB",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_newBuyPrice",
+                "type": "uint256"
+            }
+        ],
+        "name": "setBuyPrice",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_newBuyPriceFEB",
+                "type": "uint256"
+            }
+        ],
+        "name": "setBuyPriceFEB",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "buyTokens",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "buyTokensAsFEBHolder",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "withdrawTRX",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "withdrawTokens",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "stateMutability": "payable",
+        "type": "receive"
+    },
+    {
+        "inputs": [],
+        "name": "getTRXBalance",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getTokenBalance",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    }
+]
+;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        document.getElementById('connect-button').addEventListener('click', connectWallet);
+        
+        if (await checkTronLinkInstalled()) {
+            await initializeTronWeb();
+            setInterval(updateUI, 60000); // Update every minute
+        } else {
+            console.error('TronLink is not installed.');
+        }
+
+        // Regular buy tokens
+        document.getElementById('trx-amount').addEventListener('input', calculateCFT);
+        document.getElementById('buy-button').addEventListener('click', async () => {
+            const trxAmount = document.getElementById('trx-amount').value;
+            if (!trxAmount || trxAmount <= 0) {
+                alert('Please enter a valid TRX amount.');
+                return;
+            }
+            await buyTokens(trxAmount);
+        });
+
+        // FEB buy tokens
+        document.getElementById('feb-trx-amount').addEventListener('input', calculateFebCFT);
+        document.getElementById('buy-feb-button').addEventListener('click', async () => {
+            const trxAmount = document.getElementById('feb-trx-amount').value;
+            if (!trxAmount || trxAmount <= 0) {
+                alert('Please enter a valid TRX amount.');
+                return;
+            }
+            await buyTokensAsFEB(trxAmount);
+        });
+    });
+
+    async function checkTronLinkInstalled() {
+        return new Promise((resolve) => {
+            const interval = setInterval(() => {
+                if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
+                    clearInterval(interval);
+                    resolve(true);
+                }
+            }, 1000);
+        });
+    }
+
+    async function connectWallet() {
+        try {
+            await tronLink.request({ method: 'tron_requestAccounts' });
+            await initializeTronWeb();
+        } catch (e) {
+            console.error('Failed to connect to TronLink:', e);
+        }
+    }
+
+    async function initializeTronWeb() {
+        try {
+            tronWeb = window.tronWeb;
+            userAddress = tronWeb.defaultAddress.base58;
+
+            if (!userAddress) throw new Error('User address not available');
+
+            tokenContract = await tronWeb.contract(tokenContractAbi, tokenContractAddress);
+            swapContract = await tronWeb.contract(swapContractAbi, swapContractAddress);
+
+            document.getElementById('connect-button').style.display = 'none';
+            await updateUI();
+        } catch (error) {
+            console.error('Error initializing TronWeb or Contracts:', error);
+        }
+    }
+
+    async function updateUI() {
+        try {
+            await updateTRXBalance();
+            await updateAvailableCFT();
+            await updateBuyPrice();
+            await updateBuyPriceFEB();
+        } catch (error) {
+            console.error('Error updating UI:', error);
+        }
+    }
+
+    async function updateTRXBalance() {
+        try {
+            const trxBalance = await tronWeb.trx.getBalance(userAddress);
+            document.getElementById('user-trx-balance').innerText = 'TRX Balance: ' + formatNumber(tronWeb.fromSun(trxBalance)) + ' TRX';
+        } catch (error) {
+            console.error('Error fetching TRX balance:', error);
+        }
+    }
+
+    async function updateAvailableCFT() {
+        try {
+            const tokenBalance = await tokenContract.methods.balanceOf(swapContractAddress).call();
+            document.getElementById('available-cft').innerText = 'CFT available in contract: ' + formatNumber(tronWeb.fromSun(tokenBalance)) + ' CFT';
+        } catch (error) {
+            console.error('Error fetching available CFT:', error);
+        }
+    }
+
+    async function updateBuyPrice() {
+        try {
+            const buyPrice = await swapContract.methods.buyPrice().call();
+            document.getElementById('buy-price').innerText = tronWeb.fromSun(buyPrice);
+        } catch (error) {
+            console.error('Error fetching buy price:', error);
+        }
+    }
+
+    async function updateBuyPriceFEB() {
+        try {
+            const buyPriceFEB = await swapContract.methods.buyPriceFEB().call();
+            document.getElementById('buy-price-feb').innerText = tronWeb.fromSun(buyPriceFEB);
+        } catch (error) {
+            console.error('Error fetching FEB buy price:', error);
+        }
+    }
+
+    async function buyTokens(trxAmount) {
+        try {
+            await swapContract.methods.buyTokens().send({
+                from: userAddress,
+                callValue: tronWeb.toSun(trxAmount)
+            });
+            console.log('Tokens purchased.');
+            await updateUI();
+        } catch (error) {
+            console.error('Error buying tokens:', error);
+        }
+    }
+
+    async function buyTokensAsFEB(trxAmount) {
+        try {
+            await swapContract.methods.buyTokensAsFEBHolder().send({
+                from: userAddress,
+                callValue: tronWeb.toSun(trxAmount)
+            });
+            console.log('Tokens purchased (FEB holder).');
+            await updateUI();
+        } catch (error) {
+            console.error('Error buying tokens as FEB holder:', error);
+        }
+    }
+
+    function calculateCFT() {
+        const trxAmount = document.getElementById('trx-amount').value;
+        const buyPrice = document.getElementById('buy-price').innerText;
+
+        if (!trxAmount || trxAmount <= 0) {
+            document.getElementById('calculated-cft').innerText = 'CFT tokens you will get: 0 CFT';
+            return;
+        }
+
+        const cftAmount = trxAmount / buyPrice;
+        document.getElementById('calculated-cft').innerText = 'CFT tokens you will get: ' + formatNumber(cftAmount) + ' CFT';
+    }
+
+    function calculateFebCFT() {
+        const trxAmount = document.getElementById('feb-trx-amount').value;
+        const buyPriceFEB = document.getElementById('buy-price-feb').innerText;
+
+        if (!trxAmount || trxAmount <= 0) {
+            document.getElementById('calculated-feb-cft').innerText = 'CFT tokens you will get: 0 CFT';
+            return;
+        }
+
+        const cftAmount = trxAmount / buyPriceFEB;
+        document.getElementById('calculated-feb-cft').innerText = 'CFT tokens you will get: ' + formatNumber(cftAmount) + ' CFT';
+    }
+
+    function formatNumber(num) {
+        return parseFloat(num).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+  </script>
+</body>
+</html>
