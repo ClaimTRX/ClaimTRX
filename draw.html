@@ -338,7 +338,7 @@
         <div class="card-body">
           <div class="card-text-section">
           <h5 class="card-title">TRX Draw</h5>
-          <div id="trxWarningMessage" class="card-text" style="color: red; display: none;">To register, please have 50 CFT unstaked in your wallet.</div>
+          <div id="trxWarningMessage" class="card-text" style="color: red; display: none;">To register, please have 500 CFT unstaked in your wallet.</div>
           <div id="trxStatusMessage" class="card-text hidden" style="color: green;"></div>
           <div id="trxTimer">Next draw in: --:--:--</div>
           <div id="trxPrizeAmount">Current prize: 50 TRX</div> <!-- Manually change token amount and name here -->
@@ -1137,7 +1137,7 @@ async function checkCFTTokenBalance() {
     const cftTokenDecimals = 10 ** 6; // Assuming CFT has 6 decimals
 
     
-    const requiredBalanceTRX = 50 * cftTokenDecimals;
+    const requiredBalanceTRX = 500 * cftTokenDecimals;
 
 
     if (cftTokenBalance >= requiredBalanceTRX) {
