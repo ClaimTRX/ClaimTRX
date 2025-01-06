@@ -308,7 +308,7 @@
       <div class="card-body">
         <div class="card-text-section">
           <h5 class="card-title">Regular Swap CFT Tokens</h5>
-          <p class="card-text">Current Swap Rate: 1 CFT = 1 TRX</p>
+          <p class="card-text">Current Swap Rate: 1 CFT = 0.9 TRX</p>
           <p class="card-text" id="available-trx-contract">Loading TRX in Contract...</p>
           <input type="number" id="swap-amount" class="form-control" placeholder="Enter amount to swap">
           <p class="card-text" id="calculated-trx">TRX you will receive: 0 TRX</p>
@@ -353,7 +353,7 @@
     const swapContractAddress = 'TDgM1P88HkggeeQZeZQpUh86UdiDrrM6hG'; // Swap contract address
     const maxUint256 = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
     const febSwapRate = 1.05; // Special swap rate for FEB holders
-    const regularSwapRate = 1; // Regular swap rate for non-FEB holders
+    const regularSwapRate = 0.9; // Regular swap rate for non-FEB holders
 
     const tokenContractAbi = [
     {
