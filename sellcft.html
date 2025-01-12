@@ -117,9 +117,10 @@
     .card-explanation {
       margin-top: 10px;
       font-size: 0.875rem;
-      word-wrap: break-word; /* Allows wrapping within words if needed */
-  word-break: break-word; /* Prevents breaking in the middle of a word */
-  overflow-wrap: break-word; /* Ensures compatibility across browsers */
+     word-wrap: break-word;
+      word-break: break-all; /* Force breaks for long strings */
+      font-size: 14px; /* Adjust text size for better fit */
+      line-height: 1.4; /* Adjust line height to give more space between lines */
     }
 
     .form-control {
