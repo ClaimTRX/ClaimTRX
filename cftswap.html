@@ -283,7 +283,7 @@
     <a href="buy.html">Buy Tokens</a>
     <a href="staking.html">CFT Staking</a>
     <a href="games.html">Games</a>
-    <a href="swap.html">Swap</a> <!-- Swap Link -->
+    
     <a href="meme.html">Meme Staking</a>
     <a href="energy.html">Energy</a>
     <div class="social-links">
@@ -308,7 +308,7 @@
       <div class="card-body">
         <div class="card-text-section">
           <h5 class="card-title">Regular Swap CFT Tokens</h5>
-          <p class="card-text">Current Swap Rate: 1 CFT = 0.9 TRX</p>
+          <p class="card-text">Current Swap Rate: 1 CFT = 0.5 TRX</p>
           <p class="card-text" id="available-trx-contract">Loading TRX in Contract...</p>
           <input type="number" id="swap-amount" class="form-control" placeholder="Enter amount to swap">
           <p class="card-text" id="calculated-trx">TRX you will receive: 0 TRX</p>
@@ -331,7 +331,7 @@
       <div class="card-body">
         <div class="card-text-section">
           <h5 class="card-title">FEB Holder Swap</h5>
-          <p class="card-text">Special Swap Rate for FEB Holders: 1 CFT = 1.05 TRX</p>
+          <p class="card-text">Special Swap Rate for FEB Holders: 1 CFT = 1 TRX</p>
           <input type="number" id="feb-swap-amount" class="form-control" placeholder="Enter amount to swap">
           <p class="card-text" id="feb-calculated-trx">TRX you will receive: 0 TRX</p>
           <button id="feb-swap-button" class="btn btn-danger">Swap CFT (FEB)</button>
@@ -352,8 +352,8 @@
     const tokenContractAddress = 'TAQzALyftaynnr3VG3rCvzkY2KouFH79sA'; // TRC20 token contract address
     const swapContractAddress = 'TDgM1P88HkggeeQZeZQpUh86UdiDrrM6hG'; // Swap contract address
     const maxUint256 = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
-    const febSwapRate = 1.05; // Special swap rate for FEB holders
-    const regularSwapRate = 0.9; // Regular swap rate for non-FEB holders
+    const febSwapRate = 1; // Special swap rate for FEB holders
+    const regularSwapRate = 0.5; // Regular swap rate for non-FEB holders
 
     const tokenContractAbi = [
     {
