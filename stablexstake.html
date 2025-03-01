@@ -248,19 +248,19 @@
     <div class="card mt-4">
       <div class="card-body">
         <div class="card-text-section">
-          <h5 class="card-title">Stake your StableX for $STBLX rewards</h5>
+          <h5 class="card-title">Stake your StableX for StableX rewards</h5>
 
           <input type="number" id="stake-amount-token1" class="form-control" placeholder="Enter amount to stake">
           <button id="stake-button-token1" class="btn btn-success">Stake</button><br>
           <button id="unstake-button-token1" class="btn btn-danger">Unstake</button>
 
-          <h5 class="card-title mt-3">Available $STBLX in Wallet</h5>
+          <h5 class="card-title mt-3">Available StableX in Wallet</h5>
           <p class="card-text" id="available-tokens-token1">Loading...</p>
 
-          <h5 class="card-title mt-3">Your Staked $STBLX</h5>
+          <h5 class="card-title mt-3">Your Staked StableX</h5>
           <p class="card-text" id="staked-amount-token1">Loading...</p>
 
-          <h5 class="card-title mt-3">Claimable $STBLX Rewards</h5>
+          <h5 class="card-title mt-3">Claimable StableX Rewards</h5>
           <p class="card-text" id="claimable-rewards-token1">Loading...</p>
           <button id="claim-rewards-button-token1" class="btn btn-success">Claim Rewards</button>
 
@@ -1189,7 +1189,7 @@ async function updateClaimableRewards(token) {
         const decimals = await tokenContract.methods.decimals().call();
 
         const claimableRewards = claimableRewardsRaw / Math.pow(10, decimals);
-        document.getElementById(`claimable-rewards-${token}`).innerText = formatNumber(claimableRewards) + ' STBLX';
+        document.getElementById(`claimable-rewards-${token}`).innerText = formatNumber(claimableRewards) + ' StableX';
     } catch (error) {
         console.error(`Error fetching claimable rewards for ${token}:`, error);
     }
@@ -1234,7 +1234,7 @@ async function updateProjectedYearlyEarnings(token) {
         const decimals = await tokenContract.methods.decimals().call();
 
         const projectedYearlyEarnings = projectedYearlyEarningsRaw / Math.pow(10, decimals);
-        document.getElementById(`projected-yearly-earnings-${token}`).innerText = formatNumber(projectedYearlyEarnings) + ' STBLX';
+        document.getElementById(`projected-yearly-earnings-${token}`).innerText = formatNumber(projectedYearlyEarnings) + ' StableX';
     } catch (error) {
         console.error(`Error fetching projected yearly earnings for ${token}:`, error);
     }
