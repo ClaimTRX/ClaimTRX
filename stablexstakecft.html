@@ -1121,7 +1121,7 @@ async function updateAvailableTokens() {
         try {
           const balanceRaw = await tokenContract.methods.balanceOf(userAddress).call();
           const balance = Number(balanceRaw) / Math.pow(10, decimalsStableX);
-          document.getElementById('available-tokens').innerText = formatNumber(balance.toString()) + ' StableX';
+          document.getElementById('available-tokens').innerText = formatNumber(balance.toString()) + ' ';
         } catch (error) {
           console.error('Error updating available tokens:', error);
         }
@@ -1130,7 +1130,7 @@ async function updateAvailableTokens() {
 async function updateNewClaimableRewards() {
     try {
         const claimableRewards = await newStakingContract.methods.viewPendingReward(userAddress).call();
-        document.getElementById('new-claimable-rewards').innerText = formatNumber(tronWeb.fromSun(claimableRewards.toString())) + ' CFT';
+        document.getElementById('new-claimable-rewards').innerText = formatNumber(tronWeb.fromSun(claimableRewards.toString())) + ' ';
     } catch (error) {
         console.error('Error updating claimable rewards:', error);
     }
@@ -1139,7 +1139,7 @@ async function updateNewClaimableRewards() {
 async function updateTotalClaimedRewards() {
     try {
         const totalClaimedRewards = await newStakingContract.methods.viewTotalClaimedRewards(userAddress).call();
-        document.getElementById('total-claimed-rewards').innerText = formatNumber(tronWeb.fromSun(totalClaimedRewards.toString())) + ' CFT';
+        document.getElementById('total-claimed-rewards').innerText = formatNumber(tronWeb.fromSun(totalClaimedRewards.toString())) + ' ';
     } catch (error) {
         console.error('Error fetching total claimed rewards:', error);
     }
@@ -1148,7 +1148,7 @@ async function updateTotalClaimedRewards() {
 async function updateNewStakedAmount() {
     try {
         const stakedAmount = await newStakingContract.methods.viewStakedAmount(userAddress).call();
-        document.getElementById('new-staked-amount').innerText = formatWholeNumber(tronWeb.fromSun(stakedAmount.toString())) + ' StableX';
+        document.getElementById('new-staked-amount').innerText = formatWholeNumber(tronWeb.fromSun(stakedAmount.toString())) + ' ';
     } catch (error) {
         console.error('Error updating staked amount:', error);
     }
