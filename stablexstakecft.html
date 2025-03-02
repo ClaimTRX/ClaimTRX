@@ -259,6 +259,9 @@
           <h5 class="card-title mt-3">Projected Yearly CFT Rewards</h5>
           <p class="card-text" id="new-projected-rewards">Loading...</p>
 
+          <h5 class="card-title mt-3">Estimated APR</h5>
+          <p class="card-text" id="estimated-apr">Loading...</p>
+
           <h5 class="card-title mt-3">Claimable CFT Rewards</h5>
           <p class="card-text" id="new-claimable-rewards">Loading...</p>
 
@@ -284,6 +287,11 @@
       const tokenContractAddress = 'TGd1irpHHU8cFC4ArY9KBoBiocQr1vVpWS';
       const newStakingContractAddress = 'TUvHH8QtyXvMubLJRgKBdwfG7Y2TRLGSE6';
       const maxUint256 = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+
+      // Define token decimals and CFT price
+      let decimalsStableX; // To be fetched
+      const decimalsCFT = 6; // Assumption: adjust if CFT contract is available
+      let cftPrice = 0.27; // Easily updatable CFT price in USD
       const newStakingContractAbi = [
     {
         "inputs": [
@@ -1066,22 +1074,25 @@ async function connectWallet() {
 }
 
 async function initializeTronWeb() {
-    try {
-        tronWeb = window.tronWeb;
-        userAddress = tronWeb.defaultAddress.base58;
+        try {
+          tronWeb = window.tronWeb;
+          userAddress = tronWeb.defaultAddress.base58;
 
-        if (!userAddress) throw new Error('User address not available');
+          if (!userAddress) throw new Error('User address not available');
 
-        newStakingContract = await tronWeb.contract(newStakingContractAbi, newStakingContractAddress);
-        tokenContract = await tronWeb.contract(tokenContractAbi, tokenContractAddress);
+          newStakingContract = await tronWeb.contract(newStakingContractAbi, newStakingContractAddress);
+          tokenContract = await tronWeb.contract(tokenContractAbi, tokenContractAddress);
 
-        document.getElementById('connect-button').style.display = 'none';
+          // Fetch StableX decimals once
+          decimalsStableX = await tokenContract.methods.decimals().call();
 
-        await updateUI();
-    } catch (error) {
-        console.error('Error initializing TronWeb or Contracts:', error);
-    }
-}
+          document.getElementById('connect-button').style.display = 'none';
+
+          await updateUI();
+        } catch (error) {
+          console.error('Error initializing TronWeb or Contracts:', error);
+        }
+      }
 
 async function updateUI() {
     try {
@@ -1098,21 +1109,23 @@ async function updateUI() {
         await updateTotalClaimedRewards();
          await delay(500);
         await updateTotalStaked();
+      await delay(500);
+      await updateAPR(); // Added APR update
+      await delay(500);
     } catch (error) {
         console.error('Error updating UI:', error);
     }
 }
 
 async function updateAvailableTokens() {
-    try {
-        const balanceRaw = await tokenContract.methods.balanceOf(userAddress).call();
-        const decimals = await tokenContract.methods.decimals().call();
-        const balance = balanceRaw / Math.pow(10, decimals);
-        document.getElementById('available-tokens').innerText = formatNumber(balance.toString()) + ' StableX';
-    } catch (error) {
-        console.error('Error updating available tokens:', error);
-    }
-}
+        try {
+          const balanceRaw = await tokenContract.methods.balanceOf(userAddress).call();
+          const balance = Number(balanceRaw) / Math.pow(10, decimalsStableX);
+          document.getElementById('available-tokens').innerText = formatNumber(balance.toString()) + ' StableX';
+        } catch (error) {
+          console.error('Error updating available tokens:', error);
+        }
+      }
 
 async function updateNewClaimableRewards() {
     try {
@@ -1202,6 +1215,29 @@ document.getElementById('new-claim-rewards-button').addEventListener('click', as
         console.error('Error updating total staked amount:', error);
     }
 }
+
+      async function updateAPR() {
+        try {
+          const stakedAmountRaw = await newStakingContract.methods.viewStakedAmount(userAddress).call();
+          const projectedRewardsRaw = await newStakingContract.methods.viewProjectedRewardsForYear(userAddress).call();
+
+          if (stakedAmountRaw == 0) {
+            document.getElementById('estimated-apr').innerText = '0.00 %';
+            return;
+          }
+
+          const stakedTokens = Number(stakedAmountRaw) / Math.pow(10, decimalsStableX);
+          const annualRewardTokens = Number(projectedRewardsRaw) / Math.pow(10, decimalsCFT);
+          const stakedValueUSD = stakedTokens * 1; // StableX price = $1
+          const annualRewardValueUSD = annualRewardTokens * cftPrice; // CFT price = $0.27
+          const apr = (annualRewardValueUSD / stakedValueUSD) * 100;
+
+          document.getElementById('estimated-apr').innerText = apr.toFixed(2) + ' %';
+        } catch (error) {
+          console.error('Error updating APR:', error);
+          document.getElementById('estimated-apr').innerText = 'Error';
+        }
+      }
 
 
 function formatNumber(num) {
