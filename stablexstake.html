@@ -1130,7 +1130,7 @@ function delay(ms) {
 async function updateAllUI() {
     try {
         for (let token in stakingContracts) {
-            await delay(500); // Add a 1-second delay between updates
+            await delay(400); // Add a 1-second delay between updates
             await updateTokenUI(token);
         }
     } catch (error) {
@@ -1141,21 +1141,19 @@ async function updateAllUI() {
 // Update UI for a specific token
 async function updateTokenUI(token) {
     try {
-        await updateClaimableRewards(token);
-        await delay(500);
-        await updateStakedAmount(token);
-        await delay(500);
-      await updateTotalClaimedRewards(token);
-      await delay(500);
       
-        
-        
-        await updateProjectedYearlyEarnings(token);
-        await delay(500);
         await updateAvailableTokens('token1');
-        await delay(500);
+        await delay(400);
+        await updateStakedAmount(token);
+        await delay(400);
+        await updateProjectedYearlyEarnings(token);
+        await delay(400);
         await updateAPR(token);
-        await delay(500);
+        await delay(400);
+        await updateClaimableRewards(token);
+        await delay(400);
+        await updateTotalClaimedRewards(token);
+        await delay(400);
     } catch (error) {
         console.error(`Error updating UI for ${token}:`, error);
     }
