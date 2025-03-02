@@ -260,15 +260,21 @@
           <h5 class="card-title mt-3">Your Staked StableX</h5>
           <p class="card-text" id="staked-amount-token1">Loading...</p>
 
+          
+          <h5 class="card-title mt-3">Total Claimed StableX Rewards</h5>
+          <p class="card-text" id="total-claimed-rewards-token1">Loading...</p>
+
           <h5 class="card-title mt-3">Claimable StableX Rewards</h5>
           <p class="card-text" id="claimable-rewards-token1">Loading...</p>
-          <button id="claim-rewards-button-token1" class="btn btn-success">Claim Rewards</button>
+          
 
           <h5 class="card-title mt-3">Projected Yearly Earnings (You)</h5>
           <p class="card-text" id="projected-yearly-earnings-token1">Loading...</p>
           
           <h5 class="card-title mt-3">Current APR</h5>
           <p class="card-text" id="apr-token1">Loading...</p>
+
+          <button id="claim-rewards-button-token1" class="btn btn-success">Claim Rewards</button>
 
 
         </div> <!-- Close .card-text-section -->
@@ -1141,6 +1147,9 @@ async function updateTokenUI(token) {
         await delay(500);
         await updateStakedAmount(token);
         await delay(500);
+      await updateTotalClaimedRewards(token);
+      await delay(500);
+      
         
         
         await updateProjectedYearlyEarnings(token);
@@ -1151,6 +1160,19 @@ async function updateTokenUI(token) {
         await delay(500);
     } catch (error) {
         console.error(`Error updating UI for ${token}:`, error);
+    }
+}
+
+    async function updateTotalClaimedRewards(token) {
+    try {
+        const totalClaimedRewardsRaw = await stakingContracts[token].methods.viewTotalClaimedRewards(userAddress).call();
+        const tokenContract = await tronWeb.contract(tokenContractAbi, tokenContracts[token]);
+        const decimals = await tokenContract.methods.decimals().call();
+
+        const totalClaimedRewards = totalClaimedRewardsRaw / Math.pow(10, decimals);
+        document.getElementById(`total-claimed-rewards-${token}`).innerText = formatNumber(totalClaimedRewards) + ' StableX';
+    } catch (error) {
+        console.error(`Error fetching total claimed rewards for ${token}:`, error);
     }
 }
 
