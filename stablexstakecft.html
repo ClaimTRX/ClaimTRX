@@ -1096,21 +1096,19 @@ async function initializeTronWeb() {
 async function updateUI() {
     try {
         await updateAvailableTokens();
-        await delay(500);
+        await delay(400);
         await updateNewStakedAmount();
-        await delay(500);
-        await updateNewStakedPercentage();
-        await delay(500);
+        await delay(400);
         await updateProjectedRewards();
-        await delay(500);
+        await delay(400);
+        await updateAPR(); 
+        await delay(400);
         await updateNewClaimableRewards();
-        await delay(500);
+        await delay(400);
         await updateTotalClaimedRewards();
-         await delay(500);
-        await updateTotalStaked();
-      await delay(500);
-      await updateAPR(); // Added APR update
-      await delay(500);
+         wait delay(400);
+        
+        
     } catch (error) {
         console.error('Error updating UI:', error);
     }
